@@ -8,6 +8,7 @@ const loginRoute = require("../controllers/loginUser");
 const DrRegisRoute = require("../controllers/drRegis");
 const LabRegisRoute = require("../controllers/LabRegis");
 const loginDrRoute = require("../controllers/drLogin");
+const loginLabRoute = require("../controllers/labLogin");
 
 
 ///////////////////////////////////////////////////
@@ -16,7 +17,7 @@ app.use(loginRoute);
 app.use(DrRegisRoute);
 app.use(LabRegisRoute);
 app.use(loginDrRoute);
-
+app.use(loginLabRoute);
 
 
 
