@@ -5,7 +5,7 @@ const userAccount = require("../models/userAccountSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const Joi = require('joi'); //for data validate the entering data...
+const Joi = require('joi'); //for data validate... entering data...
 
 
 
