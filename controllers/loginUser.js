@@ -20,7 +20,7 @@ loginRouter.get("/api/login/", async (req, res) => {
         return res.status(401).json({ "Error": result.error.details });
     }
 
-    /////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
     try {
         const user = await userAccount.findOne({ email });
         if (user) {
