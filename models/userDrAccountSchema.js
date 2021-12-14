@@ -27,3 +27,4 @@ const registrationSchemaForDr = new Schema({
 });
 
 module.exports = mongoodb.model("DrAccount",registrationSchemaForDr);
+///////////////////////////////////////////////

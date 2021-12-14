@@ -4,7 +4,7 @@ const userDrAccount = require("../models/userDrAccountSchema");
 const Joi = require('joi');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const tokenSchema = require("../models/tokenSchema");
 loginRouter.get("/api/drLogin/", async (req, res) => {
     console.log("DrLogin");
     ///////////////////////////////////////////////////////
@@ -29,9 +29,12 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
                 const authenticate_password = await bcrypt.compare(password, user.password);
                 if (authenticate_password && email == user.email) {
                     const token = await jwt.sign({ id: user._id }, "goodwork", { expiresIn: "1y", });
-
-                    console.log(`token:${token}`);
-                    return res.status(501).json(user);
+                    const data = await tokenSchema.create({
+                        token:token,
+                        email:email,
+                    });
+                    process.env.user = email;
+                    return res.status(501).json(`The User is Login:${user},${process.env.user}`);
                 }
                 else {
                     return res.status(402).json({ "Message": "Please Enter correct Password" });

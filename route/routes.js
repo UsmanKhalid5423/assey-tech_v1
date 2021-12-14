@@ -19,6 +19,17 @@ const forgetPasswordRoute = require("../controllers/forgetPassword");
 const drforgetPasswordRoute = require("../controllers/drForgetPassword");
 const labforgetPasswordRoute = require("../controllers/labForgetPassword");
 
+
+///////Home Route////////////////////////
+const homeRoute = require("../controllers/home");
+
+///////////logout/////////////////////////////
+const logout = require("../controllers/logout");
+
+///////////DrExtraProfile/////////////////////////////
+const DrExtraProfile = require("../controllers/drExtraProfile");
+
+
 ///////////////////////////////////////////////////////////////////////
 app.use(testRoute);
 app.use(loginRoute);
@@ -30,8 +41,11 @@ app.use(forgetPasswordRoute);
 app.use(drforgetPasswordRoute);
 app.use(labforgetPasswordRoute);
 
+app.use(homeRoute);
 
+app.use(logout);
 
+app.use(DrExtraProfile);
 
 
 

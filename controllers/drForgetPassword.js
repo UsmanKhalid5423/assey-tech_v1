@@ -6,6 +6,7 @@ Router.get("/api/drforgetPassword/", async (req, res) => {
 
     var { email: email, phone: phone, newPassword: newPassword } = req.body;
     const drAccounts = require("../models/userDrAccountSchema");
+    const drAccountsProfile = require("../models/userDrAccountSchema");
 
     let val = Joi.object({
 
