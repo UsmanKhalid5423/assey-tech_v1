@@ -10,16 +10,13 @@ loginRouter.get("/api/login/", async (req, res) => {
     var { email: email, password: password } = req.body;
 
     let val = Joi.object({
-
         email: Joi.string().email().required(),
         password: Joi.string().min(2).max(11).required(),
-
     });
     const result = val.validate(req.body);
     if (result.error) {
         return res.status(401).json({ "Error": result.error.details });
     }
-
     //////////////////////////////////////////////////////////
     try {
         const user = await userAccount.findOne({ email });

@@ -13,24 +13,27 @@ const Joi = require('joi'); //for data validate... entering data...
 
 testRoute.post("/api/test/", async (req, res) => {
 
+    /////////////////////////////////
     var { full_name: full_name, age: age, email: email,
         phone_number: phone_number, password: password,
         confirm_password: confirm_password } = req.body;
 
     var val = Joi.object({
         full_name: Joi.string().min(2).max(15).required(),
-        age: Joi.number().min(2).max(100).required(),
-        email: Joi.string().min(10).email().uppercase().required(),
+        age: Joi.number().min(15).max(200).required(),
+        email: Joi.string().min(2).email().required(),
         phone_number: Joi.string().length(11).pattern(/^[0-9]+$/).required(),
-        password: Joi.string().alphanum().min(3).max(30).required(),
+        password: Joi.string().min(2).max(11).alphanum().required(),
         confirm_password: Joi.ref('password'),
     });
-
 
     const joiResult = val.validate(req.body);
     if (joiResult.error) {
         return res.status(401).json({ "Error": joiResult.error.details[0].message });
     }
+
+    ////////////////////////////////
+
 
     try {
         let existing_email = await userAccountSchema.exists({ email });
@@ -51,11 +54,12 @@ testRoute.post("/api/test/", async (req, res) => {
             phone_number: phone_number,
             password: hashPass,
         });
+        if (Schema) {
+            console.log("Your account has been registered successfully");
+            const user = await userAccount.findOne({ email });
+            return res.status(501).json({ "Alert:": `Your account has been registered successfully` });
 
-
-        console.log("Your account has been registered successfully");
-        const user = await userAccount.findOne({ email });
-        return res.status(501).json({ "Alert:": `Your account has been registered successfully` });
+        }
     }
     catch (error) {
         return res.status(401).json({ "error": error });
