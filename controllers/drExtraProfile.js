@@ -3,15 +3,16 @@ const Route = express.Router();
 const Joi = require('joi'); //for data validate the entering data...
 const DrAccountSchema = require("../models/userDrAccountSchema");
 const DrProfileSchema = require("../models/drExtraProfile");
-
+const multerMiddleware = require("../middlewares/multer");
 
 
 Route.get("/api/drRegisProfile", async (req, res) => {
     const DrEmail = process.env.user;
-     console.log(DrEmail);
-    
+    console.log(DrEmail);
+   // console.log(req.file.path);
+
     var { gender: gender, dateOfBirth: dateOfBirth, medicalSpecialty: medicalSpecialty,
-        address: address} = req.body;
+        address: address } = req.body;
 
     var val = Joi.object({
         gender: Joi.string().min(4).max(6).required(),
@@ -24,27 +25,27 @@ Route.get("/api/drRegisProfile", async (req, res) => {
     if (joiResult.error) {
         return res.status(401).json({ "Error": joiResult.error.details[0].message });
     }
-    const DrId = await DrAccountSchema.findOne({DrEmail});
+    const DrId = await DrAccountSchema.findOne({ DrEmail });
     const id = DrId._id;
     console.log(id);
     try {
-        
+
         let DoctorID = await DrAccountSchema.exists({ id });
         if (DoctorID) {
-            let DeleteExistingProfile = await DrProfileSchema.findOneAndDelete({_id:id});
+            let DeleteExistingProfile = await DrProfileSchema.findOneAndDelete({ _id: id });
         }
-            const Schema = await DrProfileSchema.create({
-                _id: id,
-                gender: gender,
-                dateOfBirth: dateOfBirth,
-                medicalSpecialty: medicalSpecialty,
-                address: address,
-            });
-        
-        return res.status().json({ "ALERT:": "Profile Updated"},{DoctorID});
+        const Schema = await DrProfileSchema.create({
+            _id: id,
+            gender: gender,
+            dateOfBirth: dateOfBirth,
+            medicalSpecialty: medicalSpecialty,
+            address: address,
+        });
+
+        return res.status(201).json({"Profile:":"Updated"});
     }
     catch (error) {
-        return res.status(401).json({ "error": error });
+        return res.status(401).json({ "Errorss": error });
     }
 
 });

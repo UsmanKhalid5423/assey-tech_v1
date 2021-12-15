@@ -1,5 +1,6 @@
 const mongoodb = require("mongoose");
 const Schema = mongoodb.Schema;
+const appurl = "http://localhost:3000";
 
 const exrtaProfile = new Schema({
     _id:{
@@ -21,7 +22,12 @@ const exrtaProfile = new Schema({
     address:{
         type: String,
         required:true
-    },    
-});
+    },
+    // image:{
+    //     type: String,
+    //     get:(images)=>{ return `${appurl}/${images}`; }
+    } 
+// }
+);
 
 module.exports = mongoodb.model("DoctorExrtaProfile",exrtaProfile);

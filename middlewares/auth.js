@@ -13,12 +13,18 @@ const auth = async function auth_token(req,res,next){
         const header = req.headers["authorization"]; //getting authorization header
         const token = header && header.split(" ")[1]; // spliting the Header veriable
       
+
+
         if(token == null) return res.status(501).json({"Message":"Token Not Found"});
+      
         jwt.verify(token,"goodwork",(err,user)=>{
             if(err)  return res.status(501).json( { "Message":"Invalid Token" } );
             console.log(user.id);
            req.user = user.id;
         });
+      
+      
+        
         const patient = await patients.findOne({_id:req.user});
         if(patient){return res.status(501).json({"Found One":patient});}
         

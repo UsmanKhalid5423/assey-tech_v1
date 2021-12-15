@@ -17,6 +17,8 @@ app.use(express.json()); //For JSON Enable...
 const routes = require("./route/routes");
 app.use(routes);
 
+app.use('/uploads', express.static('uploads'));
+
 
 
 

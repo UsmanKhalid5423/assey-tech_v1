@@ -28,6 +28,37 @@ const logout = require("../controllers/logout");
 
 ///////////DrExtraProfile/////////////////////////////
 const DrExtraProfile = require("../controllers/drExtraProfile");
+/////////////upload////////////
+const upload = require("../controllers/upload");
+
+/////////////DrSearchPatient////////////
+const DrSearchPatient = require("../controllers/drSearchPatient");
+
+///////SendSighUpLink////////////////////////
+const SendSighUpLink = require("../controllers/sendSignUpLink");
+
+
+///////SendSighUpLinkToLAB////////////////////////
+const SendSighUpLinkLab = require("../controllers/sendSighUpLinkLab");
+
+
+///////DrSearchLab////////////////////////
+const DrSearchLab = require("../controllers/DrSearchLab");
+
+///////DrSearchLab////////////////////////
+const EnterTest = require("../controllers/enterTests");
+
+///////SearchTest////////////////////////
+const SearchTests = require("../controllers/searchTests");
+
+
+
+
+
+
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -46,6 +77,27 @@ app.use(homeRoute);
 app.use(logout);
 
 app.use(DrExtraProfile);
+
+app.use(upload);
+
+app.use(DrSearchPatient);
+
+app.use(SendSighUpLink);
+
+app.use(DrSearchLab);
+
+app.use(SendSighUpLinkLab);
+
+app.use(EnterTest);
+
+app.use(SearchTests);
+
+
+
+
+
+
+
 
 
 

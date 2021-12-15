@@ -5,7 +5,7 @@ const Joi = require('joi'); //for data validate the entering data...
 const bcrypt = require("bcrypt");
 const userLabAccountSchema = require("../models/userLabAccountSchema");
 
-LabRegis.post("/api/labRegis", async (req, res) => {
+LabRegis.post("/api/labRegis/", async (req, res) => {
 
     var { lab_name: lab_name, email: email,
         phone_number: phone_number, password: password,
