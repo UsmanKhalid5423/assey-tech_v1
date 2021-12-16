@@ -38,7 +38,7 @@ Router.get("/api/searchtest/", async (req, res) => {
            const lab = await LabAccountsSchema.findOne({ lab_email });
            if (lab) {
               /////////////////////////////
-               
+            
               const test = await TestSchema.findOne({ test_name });
               if (test) {
                  
@@ -47,7 +47,8 @@ Router.get("/api/searchtest/", async (req, res) => {
                       email:email,
                       lab_email:lab_email,
                       test_name:test_name,
-                      date:date
+                      date:date,
+                      byDr:process.env.user,
                   });
                   return res.status(201).json({ "Message": "Test order has been regestered" },{"For: ":`${email}--On:${date}`});
 

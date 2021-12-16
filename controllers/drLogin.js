@@ -5,6 +5,8 @@ const Joi = require('joi');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const tokenSchema = require("../models/tokenSchema");
+const labReports = require("../models/labReportSchema");
+const reportCounts = require("../models/reportsCount");
 loginRouter.get("/api/drLogin/", async (req, res) => {
     console.log("DrLogin");
     ///////////////////////////////////////////////////////
@@ -34,7 +36,23 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
                         email:email,
                     });
                     process.env.user = email;
-                    return res.status(501).json(`The User is Login:${user},${process.env.user}`);
+                    console.log(process.env.user);
+
+                    // const labReports = await resultReports.find({
+                    //     byDr:process.env.user,
+                    // });
+                    // console.log(`from login labReports.length:${labReports.length}`);
+                    // const reports = await reportCounts.find({
+                    //     email:process.env.user,
+                    // });
+                    // console.log(reports);
+
+                    // if(labReports > reports){
+                    //     console.log(`you have a new report`);
+                    // }
+                    
+                    // console.log(`LOGIN process.env.reportsCounts:${process.env.reportsCounts}`);
+                    return res.status(501).json(`The User is Login, Email: ${process.env.user}`);
                 }
                 else {
                     return res.status(402).json({ "Message": "Please Enter correct Password" });

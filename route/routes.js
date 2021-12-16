@@ -49,7 +49,13 @@ const DrSearchLab = require("../controllers/DrSearchLab");
 const EnterTest = require("../controllers/enterTests");
 
 ///////SearchTest////////////////////////
-const SearchTests = require("../controllers/searchTests");
+const OrderTests = require("../controllers/orderTests");
+
+///////labReportUpload////////////////////////
+const labReportUpload = require("../controllers/labAdmin");
+
+///////DrReportSearch////////////////////////
+const DrReportSearch = require("../controllers/searchReports");
 
 
 
@@ -90,11 +96,11 @@ app.use(SendSighUpLinkLab);
 
 app.use(EnterTest);
 
-app.use(SearchTests);
+app.use(OrderTests);
 
+app.use(labReportUpload);
 
-
-
+app.use(DrReportSearch);
 
 
 

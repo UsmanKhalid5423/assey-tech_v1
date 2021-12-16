@@ -2,20 +2,12 @@ const mongoodb = require("mongoose");
 const Schema = mongoodb.Schema;
 
 
-const testOrder = new Schema({
+const labReport = new Schema({
     email:{
         type: String,
         required:true
     },
-    lab_email:{
-        type: String,
-        required:true
-    },
-    test_name:{
-        type: String,
-        required:true
-    },
-    date:{
+    test_Name:{
         type: String,
         required:true
     },
@@ -23,7 +15,19 @@ const testOrder = new Schema({
         type: String,
         required:true
     },
+    reportStatus:{
+        type: String,
+        required:true
+    },
+    view:{
+        type: String,
+        required:true
+    },
+    date:{
+        type: String,
+        required:true
+    },
    
 });
 
-module.exports = mongoodb.model("testOrder",testOrder);
+module.exports = mongoodb.model("labReport",labReport);

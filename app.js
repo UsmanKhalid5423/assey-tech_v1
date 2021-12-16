@@ -10,6 +10,7 @@ mongoose.connect(url,{ useNewUrlParser: true }).then(()=>{
 
 app.use(express.urlencoded({extended:false}));
 app.use(express.json()); //For JSON Enable...
+//app.use('/uploads', express.static('uploads'));
 
 
 
@@ -17,7 +18,7 @@ app.use(express.json()); //For JSON Enable...
 const routes = require("./route/routes");
 app.use(routes);
 
-app.use('/uploads', express.static('uploads'));
+
 
 
 

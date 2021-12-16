@@ -2,16 +2,19 @@ const multer = require("multer");
 const path = require("path");
 
 
+
+
+
 const Storage = multer.diskStorage({
     destination:(req,file,callback)=>{
         console.log("1");
-        callback(null , "uploads");
+        callback(null ,"../images");
         console.log("2");
     },
     
     filename:(req,file,callback)=>{
         console.log("3");
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}
+        const uniqueName = `${Date.now()}-
                             ${path.extname(file.originalname)}`;
         callback(null, uniqueName);
         console.log("4");
