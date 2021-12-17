@@ -30,30 +30,42 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
             try {
                 const authenticate_password = await bcrypt.compare(password, user.password);
                 if (authenticate_password && email == user.email) {
-                    const token = await jwt.sign({ id: user._id }, "goodwork", { expiresIn: "1y", });
-                    const data = await tokenSchema.create({
-                        token:token,
-                        email:email,
-                    });
-                    process.env.user = email;
-                    console.log(process.env.user);
 
-                    // const labReports = await resultReports.find({
-                    //     byDr:process.env.user,
-                    // });
-                    // console.log(`from login labReports.length:${labReports.length}`);
-                    // const reports = await reportCounts.find({
-                    //     email:process.env.user,
-                    // });
-                    // console.log(reports);
+                    const userToken = await tokenSchema.findOne({ email });
+                    if (userToken) {
+                        return res.status(501).json(`The User : ${process.env.user} is already Login`);
+                    }
 
-                    // if(labReports > reports){
-                    //     console.log(`you have a new report`);
-                    // }
-                    
-                    // console.log(`LOGIN process.env.reportsCounts:${process.env.reportsCounts}`);
-                    return res.status(501).json(`The User is Login, Email: ${process.env.user}`);
+                    else {
+                        const token = await jwt.sign({ id: user._id }, "goodwork", { expiresIn: "1y", });
+                        const data = await tokenSchema.create({
+                            token: token,
+                            email: email,
+                        });
+                        process.env.full_name = user.full_name;
+                        process.env.user = email;
+                        console.log(process.env.user);
+                        console.log(`Hi Dr: ${process.env.full_name}`);
+                        return res.status(501).json(`The User is Login, Email: ${process.env.user}`);
+                    }
+
                 }
+
+                // const labReports = await resultReports.find({
+                //     byDr:process.env.user,
+                // });
+                // console.log(`from login labReports.length:${labReports.length}`);
+                // const reports = await reportCounts.find({
+                //     email:process.env.user,
+                // });
+                // console.log(reports);
+
+                // if(labReports > reports){
+                //     console.log(`you have a new report`);
+                // }
+
+                // console.log(`LOGIN process.env.reportsCounts:${process.env.reportsCounts}`);
+
                 else {
                     return res.status(402).json({ "Message": "Please Enter correct Password" });
                 }

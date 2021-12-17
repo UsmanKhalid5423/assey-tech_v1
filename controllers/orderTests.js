@@ -12,18 +12,18 @@ Router.get("/api/searchtest/", async (req, res) => {
     ///////////////////////////////////////////////////////
     var {
         email: email,
-        lab_email:lab_email,
+        lab_email: lab_email,
         test_name: test_name,
-        date:date} = req.body;
+        date: date } = req.body;
 
-    let val = Joi.object({  
-        email:     Joi.string().email().required(),
-        lab_email:  Joi.string().email().required(),
+    let val = Joi.object({
+        email: Joi.string().email().required(),
+        lab_email: Joi.string().email().required(),
         test_name: Joi.string().min(2).max(15).required(),
-        date:      Joi.string().required(),
+        date: Joi.string().required(),
 
     });
-    
+
     const result = val.validate(req.body);
     if (result.error) {
         return res.status(401).json({ "Error": result.error.details });
@@ -33,38 +33,38 @@ Router.get("/api/searchtest/", async (req, res) => {
     try {
         const patient = await patientAccountsSchema.findOne({ test_name });
         if (patient) {
-           //////////////////////////////////
+            //////////////////////////////////
 
-           const lab = await LabAccountsSchema.findOne({ lab_email });
-           if (lab) {
-              /////////////////////////////
-            
-              const test = await TestSchema.findOne({ test_name });
-              if (test) {
-                 
-                  console.log(`Everythings here...${email},${lab_email},${test_name},${date},`);
-                  let Schema = await testOrder.create({
-                      email:email,
-                      lab_email:lab_email,
-                      test_name:test_name,
-                      date:date,
-                      byDr:process.env.user,
-                  });
-                  return res.status(201).json({ "Message": "Test order has been regestered" },{"For: ":`${email}--On:${date}`});
+            const lab = await LabAccountsSchema.findOne({ lab_email });
+            if (lab) {
+                /////////////////////////////
 
-      
-              }
-              else {
-                  return res.status(402).json({ "Message": "Test not in DataBase" });
-              }
+                const test = await TestSchema.findOne({ test_name });
+                if (test) {
 
-              ///////////////////////////
-           }
-           else {
-               return res.status(402).json({ "Message": "Lab not in DataBase" });
-           }
+                    console.log(`Everythings here...${email},${lab_email},${test_name},${date},`);
+                    let Schema = await testOrder.create({
+                        email: email,
+                        lab_email: lab_email,
+                        test_name: test_name,
+                        date: date,
+                        byDr: process.env.user,
+                    });
+                    return res.status(201).json({ "Message": "Test order has been regestered" }, { "For: ": `${email}--On:${date}` });
 
-        ////////////////////////////////////
+
+                }
+                else {
+                    return res.status(402).json({ "Message": "Test not in DataBase" });
+                }
+
+                ///////////////////////////
+            }
+            else {
+                return res.status(402).json({ "Message": "Lab not in DataBase" });
+            }
+
+            ////////////////////////////////////
         }
         else {
             return res.status(402).json({ "Message": "Patient not in DataBase" });

@@ -5,7 +5,6 @@ const labReport = require("../models/labReportSchema");
 const Joi = require('joi');
 
 Router.post("/api/reportCreated/", async (req, res) => {
-    console.log("/api/reportCreated/");
     let date = new Date().toISOString();
 
     ///////////////////////////////////////////////////////
@@ -37,7 +36,7 @@ Router.post("/api/reportCreated/", async (req, res) => {
             test_Name: test_Name,
             byDr: byDr,
             reportStatus: reportStatus,
-            view:"www.google.com.pk",
+            view:'https://www.google.com/',
             date: date,
         });
         return res.status(200).json({ "Lab Report:": labReportSchema });
