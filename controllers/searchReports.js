@@ -54,22 +54,22 @@ Route.get("/api/reportsearchbypatient/", async (req, res) => {
 
 
 
-const twilio = require('twilio')('','');
-Route.get("/api/send/", async (req, res) => {
-    try {
-        console.log("send");
+// const twilio = require('twilio')('','');
+// Route.get("/api/send/", async (req, res) => {
+//     try {
+//         console.log("send");
 
-        twilio.messages.create({
-            body:"Hello receiver",
-            to:"",
-            from:"",
-        });
+//         twilio.messages.create({
+//             body:"Hello receiver",
+//             to:"",
+//             from:"",
+//         });
 
 
-        return res.status(200).json({"ALERT":"send"});
+//         return res.status(200).json({"ALERT":"send"});
     
     
-    } catch (error) {
-        return res.status(401).json({"ERROR":error});
-    }
-    });
+//     } catch (error) {
+//         return res.status(401).json({"ERROR":error});
+//     }
+//     });

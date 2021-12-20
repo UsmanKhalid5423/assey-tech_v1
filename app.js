@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 
 const url = "mongodb+srv://telemedicine:telemedicinePass123@tododatabase.j4rh6.mongodb.net/Telemedicine?retryWrites=true&w=majority";
-mongoose.connect(url,{ useNewUrlParser: true }).then(()=>{
+mongoose.connect(url,{ useNewUrlParser: true }).then(()=>{ // ya connect key hai
     console.log("Telemedicine Database Connected"); 
 });
 

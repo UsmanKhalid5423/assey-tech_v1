@@ -12,7 +12,7 @@ const LabRegisRoute = require("../controllers/LabRegis");
 
 const loginRoute = require("../controllers/patientDashboard/loginUser");
 const loginDrRoute = require("../controllers/drLogin");
-const loginLabRoute = require("../controllers/labLogin");
+const loginLabRoute = require("../controllers/LabDashboard/labDashboard");
 
 ///////Forget Password Routes////////////////////////
 const forgetPasswordRoute = require("../controllers/forgetPassword");
@@ -69,6 +69,19 @@ const PatientOrderTest = require("../controllers/patientDashboard/orderTestByPat
 const PatientReportSearch = require("../controllers/searchReports");
 
 
+///////labRegisProfile////////////////////////
+const labRegisProfile = require("../controllers/LabDashboard/labExtraProfile");
+
+
+///////showOrder////////////////////////
+const showOrder = require("../controllers/LabDashboard/showOrderToBeProcessed");
+
+
+
+
+
+
+
 
 
 
@@ -119,6 +132,9 @@ app.use(PatientOrderTest);
 
 app.use(PatientReportSearch);
 
+app.use(labRegisProfile);
+
+app.use(showOrder);
 
 
 
