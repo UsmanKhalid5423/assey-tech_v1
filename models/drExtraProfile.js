@@ -3,31 +3,32 @@ const Schema = mongoodb.Schema;
 const appurl = "http://localhost:3000";
 
 const exrtaProfile = new Schema({
-    _id:{
+    _id: {
         type: String,
-        required:true
+        required: true
     },
-    gender:{
+    gender: {
         type: String,
-        required:true
+        required: true
     },
-    dateOfBirth:{
+    dateOfBirth: {
         type: String,
-        required:true
+        required: true
     },
-    medicalSpecialty:{
+    medicalSpecialty: {
         type: String,
-        required:true
+        required: true
     },
-    address:{
+    address: {
         type: String,
-        required:true
+        required: true
     },
-    // image:{
-    //     type: String,
+    image: {
+        type: String
+    }
     //     get:(images)=>{ return `${appurl}/${images}`; }
-    } 
-// }
+}
+    // }
 );
 
-module.exports = mongoodb.model("DoctorExrtaProfile",exrtaProfile);
+module.exports = mongoodb.model("DoctorExrtaProfile", exrtaProfile);

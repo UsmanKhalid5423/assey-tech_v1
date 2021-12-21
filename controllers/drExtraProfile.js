@@ -7,8 +7,9 @@ const multerMiddleware = require("../middlewares/multer");
 
 
 Route.get("/api/drRegisProfile", async (req, res) => {
-    const DrEmail = process.env.user;
-    console.log(DrEmail);
+
+    // const DrEmail = process.env.user;
+    // console.log(DrEmail);
    // console.log(req.file.path);
 
     var { gender: gender, dateOfBirth: dateOfBirth, medicalSpecialty: medicalSpecialty,

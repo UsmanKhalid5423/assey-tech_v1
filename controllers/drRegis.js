@@ -11,6 +11,8 @@ drRegis.post("/api/drRegis", async (req, res) => {
         phone_number: phone_number, password: password,
         confirm_password: confirm_password } = req.body;
 
+    const image = req.file.filename
+
     var val = Joi.object({
         full_name: Joi.string().min(2).max(15).required(),
         age: Joi.number().min(15).max(200).required(),
@@ -18,6 +20,7 @@ drRegis.post("/api/drRegis", async (req, res) => {
         phone_number: Joi.string().length(11).pattern(/^[0-9]+$/).required(),
         password: Joi.string().min(2).max(11).alphanum().required(),
         confirm_password: Joi.ref('password'),
+
     });
 
     const joiResult = val.validate(req.body);
@@ -43,6 +46,8 @@ drRegis.post("/api/drRegis", async (req, res) => {
             email: email,
             phone_number: phone_number,
             password: hashPass,
+            image: url + '/uploads/' +image
+
         });
 
 

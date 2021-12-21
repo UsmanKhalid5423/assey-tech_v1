@@ -2,35 +2,36 @@ const mongoodb = require("mongoose");
 const Schema = mongoodb.Schema;
 
 const exrtaProfilePatient = new Schema({
-    _id:{
+    _id: {
         type: String,
-        required:true
+        required: true
     },
-    gender:{
+    gender: {
         type: String,
-        required:true
+        required: true
     },
-    dateOfBirth:{
+    dateOfBirth: {
         type: String,
-        required:true
+        required: true
     },
-    insurence_Info:{
+    insurence_Info: {
         type: String,
-        required:true
+        required: true
     },
-    genetic_Disease:{
+    genetic_Disease: {
         type: String,
-        required:true
+        required: true
     },
-    address:{
+    address: {
         type: String,
-        required:true
+        required: true
     },
-    // image:{
-    //     type: String,
+    image: {
+        type: String
+    }
     //     get:(images)=>{ return `${appurl}/${images}`; }
-    } 
-// }
+}
+    // }
 );
 
-module.exports = mongoodb.model("PatientExrtaProfile",exrtaProfilePatient);
+module.exports = mongoodb.model("PatientExrtaProfile", exrtaProfilePatient);
