@@ -11,8 +11,13 @@ const jwt = require("jsonwebtoken");
 const tokenSchema = require("../models/tokenSchema");
 const labReports = require("../models/labReportSchema");
 const reportCounts = require("../models/reportsCount");
+
+const auth = require("../middlewares/auth");
+
+
+
 loginRouter.get("/api/drLogin/", async (req, res) => {
-    console.log("DrLogin");
+
     ///////////////////////////////////////////////////////
     var { email: email, password: password } = req.body;
 
@@ -31,6 +36,7 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
     try {
         const user = await userDrAccount.findOne({ email });
         if (user) {
+            console.log("User Doctor");
             try {
                 const authenticate_password = await bcrypt.compare(password, user.password);
                 if (authenticate_password && email == user.email) {
@@ -66,11 +72,11 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
         ///////////////Patient IF//////////////////////////////////////////////
         const userPatient = await userPatientAccount.findOne({ email });
         if (userPatient) {
-            console.log(userPatient);
+            console.log("User Patient");
             try {
                 const authenticate_password = await bcrypt.compare(password, userPatient.password);
                 if (authenticate_password && email == userPatient.email) {
-                    console.log("hello"); 
+                    console.log("hello");
                     const userToken = await tokenSchema.findOne({ email });
                     console.log(userToken);
                     if (userToken) {
@@ -104,11 +110,11 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
         ///////////////Lab IF//////////////////////////////////////////////
         const userLab = await userLabAccount.findOne({ email });
         if (userLab) {
-            console.log(userLab);
+            console.log("User Lab");
             try {
                 const authenticate_password = await bcrypt.compare(password, userLab.password);
                 if (authenticate_password && email == userLab.email) {
-                    console.log("hello"); 
+                    console.log("hello");
                     const userToken = await tokenSchema.findOne({ email });
                     console.log(userToken);
                     if (userToken) {
@@ -120,7 +126,7 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
                             token: token,
                             email: email,
                         });
-                        process.env.full_name = userLab.full_name;
+                        process.env.full_name = userLab.lab_name;
                         process.env.user = email;
                         console.log(process.env.user);
                         console.log(`Hi Lab Admin: ${process.env.full_name}`);
@@ -139,11 +145,11 @@ loginRouter.get("/api/drLogin/", async (req, res) => {
         }
         /////////////Lab IF////////////////////////////////////////////
         else {
-            return res.status(402).json({ "Message": "User not Found" });
+            return res.status(402).json({ "Message": "User not Found else" });
         }
 
     } catch (error) {
-        return res.status(402).json({ "Message": "User not found" });
+        return res.status(402).json({ "Message": "User not found catch" });
     }
 
 });

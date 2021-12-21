@@ -7,6 +7,11 @@ const jwt = require("jsonwebtoken");
 const tokenSchema = require("../../models/tokenSchema");
 const labReports = require("../../models/labReportSchema");
 const reportCounts = require("../../models/reportsCount");
+
+
+
+
+
 loginRouter.get("/api/patientlogin/", async (req, res) => {
     console.log("DrLogin");
     ///////////////////////////////////////////////////////

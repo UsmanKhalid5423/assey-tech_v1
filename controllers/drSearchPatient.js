@@ -2,8 +2,9 @@ const express = require("express");
 const loginRouter = express.Router();
 const patientAccount = require("../models/userAccountSchema");
 const Joi = require('joi');
+const auth = require("../middlewares/auth");
 
-loginRouter.get("/api/drsearchpatient/", async (req, res) => {
+loginRouter.get("/api/drsearchpatient/", auth ,async (req, res) => {
     console.log("DrLogin");
     ///////////////////////////////////////////////////////
     var { email: email } = req.body;

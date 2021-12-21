@@ -9,18 +9,16 @@ Router.post("/api/reportCreated/", async (req, res) => {
 
     ///////////////////////////////////////////////////////
     var {
-        email: email,
+        /// id testname reportStatus view date
+        id: id,
         test_Name: test_Name,
-        byDr: byDr,
         reportStatus: reportStatus,
-
 
     } = req.body;
 
     let val = Joi.object({
-        email: Joi.string().email().required(),
+        id: Joi.string().length(24).required(),
         test_Name: Joi.string().min(2).max(15).required(),
-        byDr: Joi.string().email().required(),
         reportStatus: Joi.string().min(2).max(15).required(),
     });
 
@@ -32,9 +30,8 @@ Router.post("/api/reportCreated/", async (req, res) => {
     /////////////////////////////////////////////////////////
     try {
         const labReportSchema = await labReport.create({
-            email: email,
+            id: id,
             test_Name: test_Name,
-            byDr: byDr,
             reportStatus: reportStatus,
             view:'https://www.google.com/',
             date: date,

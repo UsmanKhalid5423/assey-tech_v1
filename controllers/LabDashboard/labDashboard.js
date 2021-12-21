@@ -7,7 +7,13 @@ const jwt = require("jsonwebtoken");
 const tokenSchema = require("../../models/tokenSchema");
 const labReports = require("../../models/labReportSchema");
 const reportCounts = require("../../models/reportsCount");
-LabloginRouter.get("/api/labLogin/", async (req, res) => {
+
+const auth = require("../../middlewares/auth");
+
+
+
+
+LabloginRouter.get("/api/labLogin/", auth ,async (req, res) => {
     console.log("Lab Login");
     ///////////////////////////////////////////////////////
     var { email: email, password: password } = req.body;

@@ -3,27 +3,14 @@ const Router = express.Router();
 const userAccountSchema = require("../../models/userAccountSchema");
 const patientTestOrderSchema = require("../../models/patientModels/patientTestOrderSchema");
 const test = "COVID 19";
+const auth = require("../../middlewares/auth");
 
 const Joi = require('joi');
 
 
 
-Router.post("/api/patientordertest/", async (req, res) => {
+Router.post("/api/patientordertest/", auth, async (req, res) => {
 
-    var {
-        address:address
-     } = req.body;
-
-    let val = Joi.object({
-       
-        address: Joi.string().min(2).max(100).required(),
-
-    });
-
-    const result = val.validate(req.body);
-    if (result.error) {
-        return res.status(401).json({ "Error": result.error.details });
-    }
 
     ///////////////////////////////////////
 
@@ -34,10 +21,7 @@ Router.post("/api/patientordertest/", async (req, res) => {
 
             let date = new Date().toISOString();
             let orderTest = patientTestOrderSchema.create({
-                patient_name: foundPatient.full_name,
-                patient_email: foundPatient.email,
-                phone_number: foundPatient.phone_number,
-                address: address,
+                id: foundPatient._id,
                 test_name: test,
                 date: date,
             });

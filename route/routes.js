@@ -78,6 +78,12 @@ const showOrder = require("../controllers/LabDashboard/showOrderToBeProcessed");
 
 
 
+///////Test_Rout////////////////////////
+const Test = require("../controllers/test");
+
+
+
+
 
 
 
@@ -136,6 +142,7 @@ app.use(labRegisProfile);
 
 app.use(showOrder);
 
+app.use(Test);
 
 
 module.exports = app;

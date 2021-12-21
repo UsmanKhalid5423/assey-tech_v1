@@ -2,8 +2,9 @@ const express = require("express");
 const loginRouter = express.Router();
 const LabAccount = require("../models/userLabAccountSchema");
 const Joi = require('joi');
+const auth = require("../middlewares/auth");
 
-loginRouter.get("/api/drsearchlab/", async (req, res) => {
+loginRouter.get("/api/drsearchlab/", auth ,async (req, res) => {
     console.log("DrSearchLab");
     ///////////////////////////////////////////////////////
     var { email: email } = req.body;

@@ -3,15 +3,11 @@ const Schema = mongoodb.Schema;
 
 
 const labReport = new Schema({
-    email:{
+    id:{
         type: String,
         required:true
     },
     test_Name:{
-        type: String,
-        required:true
-    },
-    byDr:{
         type: String,
         required:true
     },

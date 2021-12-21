@@ -36,12 +36,18 @@ Route.get("/api/reportsearchbypatient/", async (req, res) => {
         else{
 
         console.log(process.env.user);
-        const resultReports = await LabReports.find({
-            email:process.env.user,
-        });
-        return res.status(200).json({"Reports":resultReports});}
-    
-    
+        const patientFound = await userAccountSchema.findOne({email:process.env.user});
+        if(patientFound){
+            const resultReports = await LabReports.find({
+                id : patientFound._id,
+            });
+            if(resultReports){
+                return res.status(200).json({"Reports":resultReports});}
+            }
+            else{return res.status(404).json({"Error":"report Not Found"});}
+            
+        }
+       
     } catch (error) {
         return res.status(401).json({"ERROR":error});
     }

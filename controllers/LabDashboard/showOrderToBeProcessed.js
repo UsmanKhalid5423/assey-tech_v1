@@ -1,10 +1,11 @@
 const express = require("express");
 const Route = express.Router();
+const auth = require("../../middlewares/auth");
 
 const patientTestOrdersSchema = require("../../models/patientModels/patientTestOrderSchema");
 const DrTestOrdersSchema = require("../../models/testOrderSchema");
 
-Route.get("/api/showOrders/", async (req, res) => {
+Route.get("/api/showOrders/", auth ,async (req, res) => {
     console.log("showOrders");
     try {
         const patientOrders = await patientTestOrdersSchema.find();

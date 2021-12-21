@@ -3,19 +3,7 @@ const Schema = mongoodb.Schema;
 
 
 const patientTestOrder = new Schema({
-    patient_name:{
-        type: String,
-        required:true
-    },
-    patient_email:{
-        type: String,
-        required:true
-    },
-    phone_number:{
-        type: String,
-        required:true
-    },
-    address:{
+    id:{
         type: String,
         required:true
     },

@@ -3,10 +3,10 @@ const Route = express.Router();
 const Joi = require('joi'); //for data validate the entering data...
 const patientAccountSchema = require("../../models/userAccountSchema");
 const patientExtraProfileSchema = require("../../models/patientModels/patientExtraProfileSchema");
+const auth = require("../../middlewares/auth");
 
 
-
-Route.post("/api/patientRegisProfile/", async (req, res) => {
+Route.post("/api/patientRegisProfile/", auth ,async (req, res) => {
     const ParientEmail = process.env.user;
     
    

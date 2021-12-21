@@ -25,14 +25,14 @@ const auth = async function auth_token(req,res,next){
       
       
         
-        const patient = await patients.findOne({_id:req.user});
-        if(patient){return res.status(501).json({"Found One":patient});}
+        // const patient = await patients.findOne({_id:req.user});
+        // if(patient){console.log(patient);}
         
-        const doctors = await doctors.findOne({_id:req.user});
-        if(doctors){return res.status(501).json({"Found One":doctors});}
+        // const doctors = await doctors.findOne({_id:req.user});
+        // if(doctors){console.log(doctors);}
         
-        const Labs = await doctors.findOne({_id:req.user});
-        if(Labs) {return res.status(501).json({"Found One":Labs});}
+        // const Labs = await doctors.findOne({_id:req.user});
+        // if(Labs) {console.log(Labs);}
 
         
         console.log("Auth End");

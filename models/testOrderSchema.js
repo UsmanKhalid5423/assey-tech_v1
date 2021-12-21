@@ -3,11 +3,7 @@ const Schema = mongoodb.Schema;
 
 
 const testOrder = new Schema({
-    email:{
-        type: String,
-        required:true
-    },
-    lab_email:{
+    id:{
         type: String,
         required:true
     },
@@ -19,10 +15,7 @@ const testOrder = new Schema({
         type: String,
         required:true
     },
-    byDr:{
-        type: String,
-        required:true
-    },
+    
    
 });
 
