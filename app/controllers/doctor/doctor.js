@@ -9,6 +9,7 @@ const response = require("../../utility/functions/response");
 // Importing Npm Modules.
 /*******************************************************/
 const moment = require("moment");
+const bcrypt = require("../../utility/functions/bcrypt");
 require("dotenv").config();
 
 /*******************************************************/

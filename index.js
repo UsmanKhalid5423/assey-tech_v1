@@ -58,9 +58,11 @@ app.use(function (req, res, next) {
 /*******************************************************/
 
 /**
- * Routes: Teacher.
+ * Routes
  */
-//app.use('/api/v1/teacher', require('./app/routes/teacher/teacher'));
+//app.use('/api/v1/doctor', require('./app/routes/index'));
+
+require("./app/routes/index")(app);
 
 
 /*******************************************************/
