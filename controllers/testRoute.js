@@ -12,7 +12,6 @@ const Joi = require('joi'); //for data validate... entering data...
 
 
 testRoute.post("/api/test/", async (req, res) => {
-
     /////////////////////////////////
     var { full_name: full_name, age: age, email: email,
         phone_number: phone_number, password: password,
