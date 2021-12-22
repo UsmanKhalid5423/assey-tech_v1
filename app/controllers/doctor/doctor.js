@@ -10,6 +10,7 @@ const models = require("../../../database/schema/instance");
 /*******************************************************/
 const moment = require("moment");
 const bcrypt = require("../../utility/function/bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 /*******************************************************/
@@ -21,7 +22,7 @@ require("dotenv").config();
  */
 const signUp = async (req, res, next) => {
     try {
-        let result = await manageDoctor(req,new models.registrationSchemaForDr() )
+        let result = await manageDoctor(req,new models.doctor() )
         delete result.password;
         response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
 
@@ -57,15 +58,46 @@ const signUp = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        let query ={
-            where:{
-                email: email
-            }
-        }
-        const user = await database.findBy(models.registrationSchemaForDr,{ 'email': email });
+        //const user = await database.findBy(models.registrationSchemaForDr,{ 'email': email });
+        
+        const user = await database.findBy(models.doctor,{ 'email': email });
+        
         if (user) {
-            //const comparingPasswords = await bcrypt.comparsion(password, user.password);
-            if (user) {
+            const comparingPasswords = await bcrypt.comparsion(password, user.password);
+            if (comparingPasswords) {
+                
+                const userToken = await models.tokenSchema.findOne({ email });
+                if (userToken) {
+                    //return res.status(501).json(`The User : ${process.env.user} is already Login`);
+                    return response.send(
+                        req,
+                        res,
+                        next,
+                        "info",
+                        202,
+                        "ALREADY_LOGGED_IN",
+                        null
+                    );
+                }
+
+                else {
+                    const token = await jwt.sign({ id: user._id }, "goodwork", { expiresIn: "1y", });
+                    const data = await models.tokenSchema.create({
+                        token: token,
+                        email: email,
+                    });
+                    return response.send(
+                        req,
+                        res,
+                        next,
+                        "info",
+                        200,
+                        "LOGGED_IN",
+                        data
+                    );
+                    //return res.status(501).json(`The User is Login, Email: ${process.env.user}`);
+                }
+                
                 // const authToken = await jwtToken.generatingToken(
                 //     {
                 //         id: user.id,
@@ -79,15 +111,15 @@ const login = async (req, res, next) => {
                 //     user: user.toJson(),
                 //     token: authToken
                 // }
-                return response.send(
-                    req,
-                    res,
-                    next,
-                    "info",
-                    200,
-                    "LOGGED_IN",
-                    user
-                );
+                // return response.send(
+                //     req,
+                //     res,
+                //     next,
+                //     "info",
+                //     200,
+                //     "LOGGED_IN",
+                //     user
+                // );
             }
             else {
                 return next({
@@ -111,54 +143,6 @@ const login = async (req, res, next) => {
     }
 };
 
-/**
- * Controller: It is used to fetch profile.
- */
-const fetch = async (req, res, next) => {
-    try {
-        response.send(req, res, next, "info", 200, "PROFILE_FETCHED", req.user.toJson());
-    } catch (error) {
-        return next({
-            code: 500,
-            message: "SERVER_ERROR",
-            data: error
-        });
-    }
-}
-
-/**
-* Controller: It is used to update the profile .
-*/
-const update = async (req, res, next) => {
-    try {
-        const { firstName, lastName, password } = req.body;
-        let encryptedPassword;
-        if (password)
-            encryptedPassword = await bcrypt.encryption(password);
-        else
-            encryptedPassword = req.user.password;
-
-        let adminInformation = {
-            name: {
-                firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase(),
-                lastName: lastName.charAt(0).toUpperCase() + lastName.slice(1).toLowerCase()
-            },
-            password: encryptedPassword,
-            updatedAt: moment().unix()
-        };
-        adminInformation["contact"] = req.user.contact;
-        await database.update(models.admin, { "_id": req.user._id }, adminInformation);
-        let data = { ...adminInformation };
-        delete data.password;
-        response.send(req, res, next, "info", 200, "PROFILE_UPDATED", data);
-    } catch (error) {
-        return next({
-            code: 500,
-            message: "SERVER_ERROR",
-            data: error
-        });
-    }
-};
 
 /**
  * Controller: It is used to logout user.
@@ -166,7 +150,7 @@ const update = async (req, res, next) => {
 const logout = async (req, res, next) => {
     try {
         const authToken = req.headers.authorization
-        let result = await database.update(models.admin, { "_id": req.user._id }, { "$pull": { "tokens": String(authToken) } });
+        let result = await models.tokenSchema.findOneAndDelete({token: authToken})
         if (result) {
             return response.send(
                 req,
@@ -184,7 +168,7 @@ const logout = async (req, res, next) => {
                 res,
                 next,
                 "info",
-                200,
+                202,
                 "DATA_NOT_AVAILABLE",
                 null
             );
@@ -204,8 +188,6 @@ const logout = async (req, res, next) => {
 module.exports = {
     signUp,
     login,
-    fetch,
-    update,
     logout
 };
 
@@ -215,7 +197,7 @@ module.exports = {
 const manageDoctor = async (req, doctor) => {
     
     const { fullName, email,age,phoneNumber, password } = req.body;
-    const encryptedPassword = await bcrypt.encryption(password);
+    const encryptedPassword =  await bcrypt.encryption(password);
 
     doctor.full_name = fullName
     doctor.email = email

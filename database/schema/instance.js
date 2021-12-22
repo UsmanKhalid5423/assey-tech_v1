@@ -40,7 +40,10 @@
 /*******************************************************/
 
 const database = {
-	registrationSchemaForDr: require("./userDrAccountSchema"),
+	//registrationSchemaForDr: require("./userDrAccountSchema"),
+	doctor: require("./userDrAccountSchema"),
+	tokenSchema: require("./tokenSchema"),
+	doctorProfile: require("./drExtraProfile"),
 }
 
 
