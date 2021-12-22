@@ -1,7 +1,7 @@
 /*******************************************************/
 // Importing Files.
 /*******************************************************/
-//const constantEn = require("./app/utility/locals/constantEnglish");
+const constantEn = require("./app/utility/locals/constantEnglish");
 const mongoose = require("./database/mongoose");
 
 /*******************************************************/
@@ -34,7 +34,6 @@ app.use('/uploads', express.static(__dirname + '/logs'));
 // Configuring Server.
 /*******************************************************/
 const server = app.listen(process.env.PORT, function () {
-    //logger.consoleInfo("Node application is listening at " + process.env.PORT + " port.");
     console.log("Node application is listening at " + process.env.PORT + " port.");
 });
 
@@ -65,6 +64,13 @@ app.use(function (req, res, next) {
 require("./app/routes/index")(app);
 
 
+//http://localhost:3000/api/test/
+
+// app.get('/api/test',(req,res,next)=>{
+//     res.send('hello')
+// });
+
+
 /*******************************************************/
 // Handling Errors.
 /*******************************************************/
@@ -74,6 +80,8 @@ app.use((req, res, next) => {
         message: "ROUTE_NOT_AVAILABLE"
     })
 });
+
+
 app.use((error, req, res, next) => {
     console.log(error);
     console.log("in the last block of the application middleware.")
@@ -85,8 +93,6 @@ app.use((error, req, res, next) => {
         message: responseMessage,
         data: error.data || null
     }
-    logger.error(req, response);
-    // return res.status(500).json(response);
     return res.status(error.code).json(response);
 });
 

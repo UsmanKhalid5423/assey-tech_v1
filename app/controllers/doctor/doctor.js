@@ -1,15 +1,15 @@
 /*******************************************************/
 // Importing Files.
 /*******************************************************/
-const database = require("../utility/calls/databaseRequest");
-const response = require("../../utility/functions/response");
-const models = require('../../database/schema/instance');
-const response = require("../../utility/functions/response");
+const database = require("../../utility/calls/databaseRequest");
+const response = require("../../utility/function/response");
+const models = require("../../../database/schema/instance");
+//const response = require("../../utility/functions/response");
 /*******************************************************/
 // Importing Npm Modules.
 /*******************************************************/
 const moment = require("moment");
-const bcrypt = require("../../utility/functions/bcrypt");
+const bcrypt = require("../../utility/function/bcrypt");
 require("dotenv").config();
 
 /*******************************************************/
@@ -21,7 +21,7 @@ require("dotenv").config();
  */
 const signUp = async (req, res, next) => {
     try {
-        let result = await manageDoctor(req,new models.DrAccount({}))
+        let result = await manageDoctor(req,new models.registrationSchemaForDr() )
         delete result.password;
         response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
 
@@ -57,23 +57,28 @@ const signUp = async (req, res, next) => {
 const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const user = await database.findBy(models.admin, { 'contact.email': email });
+        let query ={
+            where:{
+                email: email
+            }
+        }
+        const user = await database.findBy(models.registrationSchemaForDr,{ 'email': email });
         if (user) {
-            const comparingPasswords = await bcrypt.comparsion(password, user.password);
-            if (comparingPasswords) {
-                const authToken = await jwtToken.generatingToken(
-                    {
-                        id: user.id,
-                        email: user.email
-                    },
-                    true,
-                    0
-                );
-                await database.update(models.admin, { "_id": user._id }, { "$push": { "tokens": String(authToken) } });
-                const data = {
-                    user: user.toJson(),
-                    token: authToken
-                }
+            //const comparingPasswords = await bcrypt.comparsion(password, user.password);
+            if (user) {
+                // const authToken = await jwtToken.generatingToken(
+                //     {
+                //         id: user.id,
+                //         email: user.email
+                //     },
+                //     true,
+                //     0
+                // );
+                // await database.update(models.admin, { "_id": user._id }, { "$push": { "tokens": String(authToken) } });
+                // const data = {
+                //     user: user.toJson(),
+                //     token: authToken
+                // }
                 return response.send(
                     req,
                     res,
@@ -81,7 +86,7 @@ const login = async (req, res, next) => {
                     "info",
                     200,
                     "LOGGED_IN",
-                    data
+                    user
                 );
             }
             else {
@@ -212,12 +217,14 @@ const manageDoctor = async (req, doctor) => {
     const { fullName, email,age,phoneNumber, password } = req.body;
     const encryptedPassword = await bcrypt.encryption(password);
 
-    doctor.fullName = fullName
+    doctor.full_name = fullName
     doctor.email = email
     doctor.age = age
-    doctor.phoneNumber = phoneNumber
+    doctor.phone_number = phoneNumber
     doctor.password = encryptedPassword
-        
+    
+    //return doctor;
+    
     return await database.save(doctor);
 }
 
