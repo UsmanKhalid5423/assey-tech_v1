@@ -28,7 +28,10 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 //app.use(appLanguage());
-app.use('/uploads', express.static(__dirname + '/logs'));
+//app.use('/uploads', express.static(__dirname + '/logs'));
+
+app.use('/uploads', express.static(__dirname + '/uploads'));
+
 
 /*******************************************************/
 // Configuring Server.

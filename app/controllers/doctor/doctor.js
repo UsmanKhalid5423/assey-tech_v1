@@ -143,6 +143,134 @@ const login = async (req, res, next) => {
     }
 };
 
+/**
+ * Controller: It is used by doctor to add/update profile.
+ */
+const profile = async (req,res,next)=>{
+    try {
+        const email = req.userEmail
+        const doctorDetails = await database.findBy(models.doctor,{ 'email': email });
+        if(doctorDetails)
+        {
+            const doctorId = doctorDetails._id;
+            const doctorProfiledetails = await database.findBy(models.doctorProfile,{ '_id': doctorId });
+            if(doctorProfiledetails)
+            {
+                return response.send(req, res, next, "info", 200, "PROFILE_ALREADY_EXISTS", doctorProfiledetails);
+            }
+            let  doctorProfile = new models.doctorProfile()
+            let result = await manageDoctorProfile(req,doctorProfile,doctorId)
+
+            return response.send(req, res, next, "info", 201, "PROFILE_ADDED", result);
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    }
+    catch (error) {
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
+
+/**
+ * Controller: It is used by doctor to add/update profile.
+ */
+ const updateProfile = async (req,res,next)=>{
+
+    try {
+        const email = req.userEmail
+        let doctorProfile;
+        let doctorId;
+        const doctorDetails = await database.findBy(models.doctor,{ 'email': email });
+        if(doctorDetails)
+        {
+            doctorId = doctorDetails._id;
+            doctorProfile = await database.findBy(models.doctorProfile,{ '_id': doctorId });
+        }
+        if(doctorProfile)
+        {
+            let  doctorProfileDetails = await manageDoctorProfile(req,doctorProfile,doctorId)
+            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", doctorProfileDetails);
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    }
+    catch (error) {
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
+
+
+
+/**
+ * Controller: It is used by doctor to add/update profile.
+ */
+ const find = async (req,res,next)=>{
+
+    try {
+        const email = req.userEmail
+        let doctorId;
+        let doctorProfileDetails;
+        const doctorDetails = await database.findBy(models.doctor,{ 'email': email });
+        if(doctorDetails)
+        {
+            doctorId = doctorDetails._id;
+            doctorProfileDetails = await database.findBy(models.doctorProfile,{ '_id': doctorId });
+            let data = {
+                doctorDetails: doctorDetails,
+                doctorProfileDetails: doctorProfileDetails
+            }
+            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", data);
+
+        }
+        
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    }
+    catch (error) {
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
+
+
+
+
+
 
 /**
  * Controller: It is used to logout user.
@@ -188,12 +316,17 @@ const logout = async (req, res, next) => {
 module.exports = {
     signUp,
     login,
+    profile,
+    updateProfile,
+    find,
     logout
 };
 
 
 
-
+/**
+ * Controller: It is manage doctor information.
+ */
 const manageDoctor = async (req, doctor) => {
     
     const { fullName, email,age,phoneNumber, password } = req.body;
@@ -210,5 +343,18 @@ const manageDoctor = async (req, doctor) => {
     return await database.save(doctor);
 }
 
-
+/**
+ * Controller: It is manage doctor profile/extra information.
+ */
+const manageDoctorProfile = async (req, doctorProfile,doctorId) => {
+    
+    const { gender, dateOfBirth,medicalSpecialty,address } = req.body;
+    doctorProfile._id = doctorId
+    doctorProfile.gender = gender
+    doctorProfile.dateOfBirth = dateOfBirth
+    doctorProfile.medicalSpecialty = medicalSpecialty
+    doctorProfile.address = address
+    doctorProfile.image = req.files.length>0 ? req.files[0].filename : doctorProfile.image
+    return await database.save(doctorProfile);
+}
 
