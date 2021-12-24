@@ -44,12 +44,17 @@ const database = {
 	doctor: require("./userDrAccountSchema"),
 	tokenSchema: require("./tokenSchema"),
 	doctorProfile: require("./drExtraProfile"),
+	patient: require("./userAccountSchema"),
+	patientProfile: require("./patientModels/patientExtraProfileSchema"),
 }
-
+//  const patient_database = {
+	
+//  }
 
 //module.exports = db;
 
 module.exports = database;
+// module.exports = patient_database;
 
 
 

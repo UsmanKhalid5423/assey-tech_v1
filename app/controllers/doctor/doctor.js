@@ -278,7 +278,9 @@ const profile = async (req,res,next)=>{
 const logout = async (req, res, next) => {
     try {
         const authToken = req.headers.authorization
+        console.log(authToken);
         let result = await models.tokenSchema.findOneAndDelete({token: authToken})
+        console.log(result);
         if (result) {
             return response.send(
                 req,

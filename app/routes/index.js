@@ -3,10 +3,8 @@
 /*******************************************************/
 module.exports = function (app) {
     app.use('/api/v1/assay/doctor', require('./doctor/doctor'));
-
-   
-
-}
+    app.use('/api/v1/assay/patient', require('./patient/patient'));
+   }
 
 
 // /*******************************************************/
