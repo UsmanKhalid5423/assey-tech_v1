@@ -3,6 +3,7 @@ const constants = {
     ROUTE_NOT_AVAILABLE: "Requested route is not available",
     LOGGED_IN: "Login successfull",
     AUTHORIZATION_FAILED: "Invalid username or password.",
+    ALREADY_EXISTS: "Account already exists",
     ALREADY_LOGGED_IN: "The user is already logged in.",
     LOGGED_OUT: "User logout successfull.",
     DATA_NOT_AVAILABLE: "Data not available.",
@@ -13,7 +14,7 @@ const constants = {
     LAB_ADDED: "lab added successfully.",
     LAB_UPDATED: "lab updated successfully",
     LAB_ALREADY_EXISTS: "lab already exists",
-    FETCH_SUCCESSFULLY : "Records fetch successfully"
+    FETCH_SUCCESSFULLY : "Records fetch successfully",
   };
   module.exports = function (key) {
     return constants[key];

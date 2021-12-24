@@ -4,8 +4,7 @@
 module.exports = function (app) {
     app.use('/api/v1/assay/doctor', require('./doctor/doctor'));
     app.use('/api/v1/assay/lab', require('./lab/lab'));
-
-
+    app.use('/api/v1/assay/patient', require('./patient/patient'));
 }
 
 

@@ -43,8 +43,17 @@ const profile = (req, res, next) => {
 
 }
 
+const login = (req, res, next) => {
+  schema = joi.object().keys({
+    email: joi.string().email().required(),
+    password: joi.string().required(),
+  })
+
+  validatingSchema.joiValidator(req.body, schema, next)
+}
 
 module.exports = {
   add,
-  profile
+  profile,
+  login,
 }

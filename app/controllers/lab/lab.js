@@ -22,9 +22,14 @@ require("dotenv").config();
  */
 const signUp = async (req, res, next) => {
     try {
+        const isUnique = await isDataUnique(req);
+        if(!isUnique)
+        {
+            return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
+        }
         let result = await manageLab(req,new models.lab() )
         delete result.password;
-        response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
+        return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
 
     } catch (error) {
         let errorMessge;
@@ -334,3 +339,13 @@ const manageLabProfile = async (req, labProfile,labId) => {
     return await database.save(labProfile);
 }
 
+/**
+ * Controller: It is used check is email already exist.
+ */
+ const isDataUnique = async (req) => {
+    const {email} = req.body
+    let result = await database.findBy(models.lab,{'email':email})
+    if(result)
+        return false
+    return true
+}

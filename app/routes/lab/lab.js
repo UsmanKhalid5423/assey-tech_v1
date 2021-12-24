@@ -17,34 +17,34 @@ const upload = require("../../middlewares/uploadImage");
 /*******************************************************/
 
 /**
- * Controller: It is used for doctor signup.
+ * Controller: It is used for lab signup.
  */
 router.route('/signup').post(validator.add,lab.signUp);
 
 /**
- * Controller: It is used for doctor login.
+ * Controller: It is used for lab login.
  */
-router.route('/login').post(lab.login);
+router.route('/login').post(validator.login, lab.login);
 
 /**
- * Controller: It is used to add doctor profile.
+ * Controller: It is used to add lab profile.
  */
 router.route('/add/profile').post(upload.uploadimg.any(),authentication('lab'),validator.profile,lab.profile);
 
 /**
- * Controller: It is used to update doctor profile.
+ * Controller: It is used to update lab profile.
  */
 router.route('/update/profile').patch(upload.uploadimg.any(),authentication('lab'),validator.profile, lab.updateProfile);
 
 
 /**
- * Controller: It is used to get doctor details.
+ * Controller: It is used to get lab details.
  */
  router.route('/detail').get(authentication('lab'), lab.find);
 
 
 /**
- * Controller: It is used to logout doctor.
+ * Controller: It is used to logout.
  */
 router.route('/logout').post(authentication('lab'), lab.logout);
 

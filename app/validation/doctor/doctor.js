@@ -31,6 +31,32 @@ const add = (req, res, next) => {
 
 
 }
+
+
+const profile = (req, res, next) => {
+  schema = joi.object().keys({
+    gender: joi.string().valid('male', 'female', 'other').required(),
+    dateOfBirth: joi.date().required(),
+    medicalSpecialty: joi.string().required(),
+    address: joi.string().required(),
+  })
+
+  validatingSchema.joiValidator(req.body, schema, next)
+ 
+}
+
+
+const login = (req, res, next) => {
+  schema = joi.object().keys({
+    email: joi.string().email().required(),
+    password: joi.string().required(),
+  })
+
+  validatingSchema.joiValidator(req.body, schema, next)
+}
+
 module.exports = {
   add,
+  profile,
+  login,
 }
