@@ -24,11 +24,14 @@ module.exports = function (type) {
 
             if(token)
             {
-                switch (type) {
-                    case "doctor":
-                        data = await database.findBy(models.tokenSchema, { 'token': token } );
-                        break;
-                }
+                // no need of type, because we have only 1 table for token
+                //  switch (type) {
+                //     case "doctor":
+                //         data = await database.findBy(models.tokenSchema, { 'token': token } );
+                //         break;
+                // }
+
+                data = await database.findBy(models.tokenSchema, { 'token': token } );
                 if (data) {
                     req.userEmail = data.email
                     return next()

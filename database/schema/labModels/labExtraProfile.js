@@ -15,11 +15,11 @@ const exrtaProfileLab = new Schema({
         required:true
     },
     
-    // image:{
-    //     type: String,
-    //     get:(images)=>{ return `${appurl}/${images}`; }
+    image:{
+        type: String,
+        //get:(images)=>{ return `${appurl}/${images}`; }
     } 
-// }
+}
 );
 
 module.exports = mongoodb.model("LabExrtaProfile",exrtaProfileLab);

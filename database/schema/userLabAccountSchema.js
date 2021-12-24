@@ -19,6 +19,10 @@ const registrationSchemaForLab = new Schema({
         type: String,
         required:true
     },
+    startDate:{
+        type: Date,
+        required:true
+    }
    
 });
 

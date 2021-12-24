@@ -44,6 +44,8 @@ const database = {
 	doctor: require("./userDrAccountSchema"),
 	tokenSchema: require("./tokenSchema"),
 	doctorProfile: require("./drExtraProfile"),
+	lab: require("./userLabAccountSchema"),
+	labProfile: require("./labModels/labExtraProfile"),
 }
 
 
