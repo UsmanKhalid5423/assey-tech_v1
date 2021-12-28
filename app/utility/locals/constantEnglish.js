@@ -15,6 +15,9 @@ const constants = {
     LAB_UPDATED: "lab updated successfully",
     LAB_ALREADY_EXISTS: "lab already exists",
     FETCH_SUCCESSFULLY : "Records fetch successfully",
+    TEST_ADDED: "Test added successfully",
+    RESULT_ADDED: "Result added successfully"
+
   };
   module.exports = function (key) {
     return constants[key];

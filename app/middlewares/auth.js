@@ -25,15 +25,55 @@ module.exports = function (type) {
             if(token)
             {
                 // no need of type, because we have only 1 table for token
-                //  switch (type) {
-                //     case "doctor":
-                //         data = await database.findBy(models.tokenSchema, { 'token': token } );
-                //         break;
-                // }
+                 switch (type) {
+                    case "doctor":
+                        
+                        data = await database.findBy(models.tokenSchema, { 'token': token } );
+                        if(data)
+                        {
+                            result = await database.findBy(models.doctor,{'email' : data.email})
+                        }
+                        if(!result)
+                        {
+                            return next({
+                                code: 403,
+                                message: "UN_AUTHORIZED_USER",
+                                data: null
+                            })
+                        }
+                        break;
+                    case "patient":
+                    
+                        data = await database.findBy(models.tokenSchema, { 'token': token } );
+                        result = await database.findBy(models.patient,{'email' : data.email})
+                        if(!result)
+                        {
+                            return next({
+                                code: 403,
+                                message: "UN_AUTHORIZED_USER",
+                                data: null
+                            })
+                        }
+                        break;
+                    case "lab":
+                    
+                        data = await database.findBy(models.tokenSchema, { 'token': token } );
+                        result = await database.findBy(models.lab,{'email' : data.email})
+                        if(!result)
+                        {
+                            return next({
+                                code: 403,
+                                message: "UN_AUTHORIZED_USER",
+                                data: null
+                            })
+                        }
+                        break;
+                }
 
-                data = await database.findBy(models.tokenSchema, { 'token': token } );
+                //data = await database.findBy(models.tokenSchema, { 'token': token } );
                 if (data) {
                     req.userEmail = data.email
+                    req.userId = result._id
                     return next()
                 }
                 else {

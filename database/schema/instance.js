@@ -13,6 +13,8 @@ const database = {
 	labProfile: require("./labModels/labExtraProfile"),
 	patient: require("./userAccountSchema"),
 	patientProfile: require("./patientModels/patientExtraProfileSchema"),
+	test: require("./test"),
+
 }
 
 module.exports = database;

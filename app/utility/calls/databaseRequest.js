@@ -49,6 +49,18 @@
   };
   
   /**
+   * Function: It is used find an resource by id.
+   */
+   const findById_v2 = async (model, _id,attributes) => {
+    if (attributes)
+    return await model.findById(_id).select(attributes);
+    else
+    return await model.findById(_id);
+  };
+  
+
+
+  /**
    * Function: It is used count all resources.
    */
   const count = async (model, query) => {
@@ -72,6 +84,7 @@
     save,
     fetch,
     findById,
+    findById_v2,
     findBy,
     count,
     update
