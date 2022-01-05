@@ -13,6 +13,16 @@ const upload = require("../../middlewares/uploadImage");
 ///Dr sighnUp Rote
 router.route('/signup').post(validator.add,patient.signUp);
 
+/**
+ * Controller: It is used to add doctor profile.
+ */
+ router.route('/verify/OTP').post(patient.verifyOTP);
+
+ /**
+ * Controller: It is used to add doctor profile.
+ */
+  router.route('/resend/OTP').post(patient.resendOTP);
+
 router.route('/login').post(validator.login, patient.login);
 /**
  * Controller: It is used to add doctor profile.

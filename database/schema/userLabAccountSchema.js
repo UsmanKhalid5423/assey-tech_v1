@@ -22,7 +22,17 @@ const registrationSchemaForLab = new Schema({
     startDate:{
         type: Date,
         required:true
-    }
+    },
+    // change by usman khalid
+    isEmailVerified:{
+        type: Boolean,
+        default: false,
+        required: false,
+    },
+    OTP:{
+        type: String,
+        required:false
+    },
    
 });
 

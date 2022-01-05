@@ -16,7 +16,9 @@ const constants = {
     LAB_ALREADY_EXISTS: "lab already exists",
     FETCH_SUCCESSFULLY : "Records fetch successfully",
     TEST_ADDED: "Test added successfully",
-    RESULT_ADDED: "Result added successfully"
+    RESULT_ADDED: "Result added successfully",
+    VERIFY_EMAIL: "An OTP is sent to your email. Kindly verify your email.",
+    INCORRECT_OTP: "You enter an incorrect OTP password. Please try again."
 
   };
   module.exports = function (key) {

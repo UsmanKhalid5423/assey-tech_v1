@@ -4,6 +4,8 @@
 const database = require("../../utility/calls/databaseRequest");
 const models = require("../../../database/schema/instance");
 const response = require("../../utility/function/response");
+const nodeMailer = require("../../../utility/service/email");
+const code = require("../../utility/function/code");
 /*******************************************************/
 // Importing Npm Modules.
 /*******************************************************/
@@ -20,14 +22,27 @@ require("dotenv").config();
  */
 const signUp = async (req , res ,next) =>{
     try {
+
+        const {email} = req.body
+        const OTP = code.otpCode();
         const isUnique = await isDataUnique(req);
         if(!isUnique)
         {
             return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
         }
+        req.body.OTP = OTP 
+        let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+        nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email );
         let result = await managePatient(req, new models.patient());
-        delete result.password;
-        return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
+        delete result.OTP
+        delete result.isEmailVerified
+        delete result.password
+        return response.send(req, res, next, "info", 201, "VERIFY_EMAIL", result);
+
+        //return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
     } catch (error) {
         let errorMessge;
         if (Number(error.code) === 11000) {
@@ -59,7 +74,7 @@ const login = async(req, res, next)=>{
     try {
         const { email, password } = req.body;
         const user = await database.findBy(models.patient,{ 'email': email });
-        if (user) {
+        if (user && user.isEmailVerified) {
             const comparingPasswords = await bcrypt.comparsion(password, user.password);
             if (comparingPasswords) {
                 
@@ -92,6 +107,22 @@ const login = async(req, res, next)=>{
                     data: null
                 });
             }
+        }
+        else if(user && !user.isEmailVerified)
+        {
+            const OTP = code.otpCode();
+            let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+            nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email);
+            user.OTP = OTP;
+            await database.save(user)
+            delete user.OTP
+            delete user.isEmailVerified
+            delete user.password
+            return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", user);
+
         }
         return next({
             code: 401,
@@ -144,7 +175,125 @@ const profile = async (req,res,next)=>{
     }
 }
 
-///////////////////////////////////
+
+const verifyOTP = async (req , res ,next) =>{
+    try {
+
+        const {email,OTP} = req.body
+
+        console.log('==== >>> email == >>> ',email)
+        
+        const user = await database.findBy(models.patient,{ 'email': email });
+        console.log('==== >>> user == >>> ',user)
+        if(user)
+        {
+            if(user.OTP==OTP)
+            {
+                user.isEmailVerified = true
+                await database.save(user)
+                delete user.OTP
+                delete user.isEmailVerified
+                delete user.password
+                return response.send(req, res, next, "info", 200, "SIGN_UP_COMPLETED", user);
+            }
+            else
+            {
+                return response.send(req, res, next, "info", 200, "INCORRECT_OTP", null);
+            }
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+
+        //return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
+
+
+const resendOTP = async (req , res ,next) =>{
+    try {
+
+        const {email} = req.body
+        const user = await database.findBy(models.patient,{ 'email': email });
+        if(user)
+        {
+            const OTP = code.otpCode();
+            let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+            nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email);
+            user.OTP = OTP;
+            await database.save(user)
+            return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", user);
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
+
 
 
 /**
@@ -189,16 +338,6 @@ const profile = async (req,res,next)=>{
 
 
 
-
-
-
-
-
-
-
-///////////////////////////////////
-
-
 const logout = async (req, res, next) => {
     try {
         const authToken = req.headers.authorization
@@ -235,11 +374,6 @@ const logout = async (req, res, next) => {
     }
 }
 
-
-
-
-
-//////////////////////////////////
 
 
 /**
@@ -286,11 +420,6 @@ const logout = async (req, res, next) => {
 
 
 
-
-
-//////////////////////////////////
-
-
 module.exports = {
     signUp,
     login,
@@ -298,10 +427,12 @@ module.exports = {
     updateProfile,
     find,
     logout,
+    verifyOTP,
+    resendOTP
 }
 
 const managePatient = async (req,patient)=>{
-    const { fullName, email, age, phoneNumber, password} = req.body;
+    const { fullName, email, age, phoneNumber, password, OTP} = req.body;
     const encryptedPassword = await bcrypt.encryption(password);
 
     patient.full_name = fullName
@@ -309,7 +440,7 @@ const managePatient = async (req,patient)=>{
     patient.age = age
     patient.phone_number = phoneNumber
     patient.password = encryptedPassword
-
+    patient.OTP = OTP
     return await database.save(patient);
 
 }

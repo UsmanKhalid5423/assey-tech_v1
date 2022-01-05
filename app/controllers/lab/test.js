@@ -10,6 +10,10 @@ const models = require("../../../database/schema/instance");
 const moment = require("moment");
 const bcrypt = require("../../utility/function/bcrypt");
 const jwt = require("jsonwebtoken");
+let ejs = require("ejs");
+const fs = require('fs')
+let pdf = require("html-pdf");
+
 require("dotenv").config();
 
 /*******************************************************/
@@ -21,16 +25,24 @@ require("dotenv").config();
  */
 const add = async (req, res, next) => {
     try {
-        let testId = req.id
-
-        let testDetails = await database.findById(models.test,testId)
-
+        let testId = req.params.id
+       
+        let testDetails = await database.findBy(models.test,{'_id': testId})
         if(testDetails)
         {
             const { result, testStatus } = req.body
             testDetails.result = result
             testDetails.testStatus = testStatus
-            let data = await database.save(result)
+            let data = await database.save(testDetails)
+
+            if(testStatus=='completed')
+            {
+                await createResultPdf(data);
+            }
+
+
+
+
             return response.send(req, res, next, "info", 201, "RESULT_ADDED", data);
         }
 
@@ -248,4 +260,81 @@ module.exports = {
     find,
     fetch
 };
+
+
+const createResultPdf = async (data)=>{
+    const patientDetails = await database.findBy(models.patient,{'_id':data.patientId});
+    const testName = data.testName
+    const testDate = moment(data.date).format('YYYY-MM-DD')
+    const testResult = data.result
+    const labDetails = await database.findBy(models.lab,{'_id':data.labId});
+   await generatePdf(patientDetails.full_name,labDetails.lab_name,testName,testDate,testResult);
+}
+
+
+
+const generatePdf = async (patientName,labName,testName,testDate,testResult) => {
+
+      await ejs.renderFile('./views/report.ejs',{ patientName:patientName,labName:labName,testName:testName,testDate:testDate,testResult:testResult}, (err, data) => {  
+        if (err) {
+            console.log("err while crearing html");
+            console.log(err);
+            return next({ code: 500, message: "SERVER_ERROR", data: error });
+        } else {
+
+            //invoiceData = data;
+
+            let options = {
+                "format": "A2",
+                "orientation": "portrait",
+                //"quality": "75",
+            };
+
+           // pdf.create(data, options).toFile("./uploads/childInvoice/"+fileName+".pdf", async function (err, data) {
+            pdf.create(data, options).toFile("result.pdf", async function (err, data) {
+                if (err) {
+                    console.log("err while crearing pdf");
+                    console.log(err);
+                    //return next({ code: 500, message: "SERVER_ERROR", data: error });
+                } else {
+                    console.log("FIle CREATED");
+
+                    let baseUrl, directory
+                    // switch (process.env.ENV) {
+                    //     case "development":
+                    //         baseUrl = 'https://sdn-staging.s3.eu-west-2.amazonaws.com'
+                    //         directory = "/invoiceDevelop";
+                    //         break;
+                    //     case "staging":
+                    //         baseUrl = 'https://sdn-staging.s3.eu-west-2.amazonaws.com'
+                    //         directory = "/invoiceStaging";
+                    //         break;
+                    //     case "production":
+                    //         baseUrl = 'https://sdn-staging.s3.eu-west-2.amazonaws.com'
+                    //         directory = "/invoiceProduction";
+                    //         break;
+                    // }
+
+                    
+
+                    //url = baseUrl + directory + '/' + fileName +'.pdf'
+                    //invoiceDetail.invoiceDownloadUrl = url
+                    //await database.save(invoiceDetail)
+
+                    //await uploadpdf(fileName,directory);
+                    
+                }
+            });
+
+
+        }
+    });
+   
+    // invoiceDetail.invoiceDownloadUrl = url
+    // await database.save(invoiceDetail)
+    //return url;
+}
+
+
+
 

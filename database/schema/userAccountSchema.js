@@ -23,6 +23,16 @@ const registrationSchema = new Schema({
         type: String,
         required:true
     },
+    // change by usman khalid
+    isEmailVerified:{
+        type: Boolean,
+        default: false,
+        required: false,
+    },
+    OTP:{
+        type: String,
+        required:false
+    },
    
 });
 

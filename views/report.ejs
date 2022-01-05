@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+    <style>
+        body {
+            padding-left: 200px;
+            padding-right: 200px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .patient-record {
+            margin-top: 50px;
+        }
+
+        .name {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            justify-content: space-around;
+        }
+
+        .table-box {
+            margin: 50px auto;
+        }
+
+        .table-roww {
+            display: table;
+            width: 70%;
+            margin: 0px auto;
+            background: transparent;
+            padding: 5px 0px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .table-celll {
+            display: table-cell;
+            width: 30%;
+            text-align: start;
+            border-bottom: 1px solid #d6d4d4;
+            vertical-align: middle;
+            color: black;
+            font-weight: 700;
+        }
+
+        .table-cellll {
+            display: table-cell;
+            width: 30%;
+            text-align: end;
+            border-bottom: 1px solid #d6d4d4;
+            vertical-align: middle;
+        }
+
+        .table-row {
+            display: table;
+            width: 70%;
+            margin: 10px auto;
+            background: transparent;
+            padding: 5px 0px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .table-cell {
+            display: table-cell;
+            width: 30%;
+            text-align: center;
+            border-right: 1px solid #d6d4d4;
+            vertical-align: middle;
+        }
+
+        .table-head {
+            background: #5BBFEA;
+            box-shadow: none;
+            color: white;
+            font-weight: 700;
+        }
+
+        .table-head .table-cell {
+            border-right: none;
+        }
+
+        .br-0 {
+            border-right: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo">
+        <img src="./A-Logo 1.png" alt="logo" />
+    </div>
+    <div class="table-box">
+        <div class="table-roww">
+            <div class="table-celll">
+                <p>Patient Name</p>
+            </div>
+            <div class="table-cellll">
+                
+                <p><%= patientName %></p>
+            </div>
+        </div>
+        <div class="table-roww">
+            <div class="table-celll">
+                <p>Laboratory Name</p>
+            </div>
+            <div class="table-cellll">
+                <p><%= labName  %></p>
+            </div>
+        </div>
+        <div class="table-roww">
+            <div class="table-celll">
+                <p>Test Name</p>
+            </div>
+            <div class="table-cellll">
+                <p><%= testName  %></p>
+            </div>
+        </div>
+        <div class="table-roww">
+            <div class="table-celll">
+                <p>Test Date</p>
+            </div>
+            <div class="table-cellll">
+                <p><%= testDate  %></p>
+            </div>
+        </div>
+    </div>
+    <div class="table-box">
+        <div class="table-row table-head">
+            <div class="table-cell">
+                <p>Test(s)</p>
+            </div>
+            <div class="table-cell">
+                <p>Result(s)</p>
+            </div>
+            <!-- <div class="table-cell">
+                <p>Reference(s)</p>
+            </div> -->
+        </div>
+        <div class="table-row">
+            <div class="table-cell">
+                <p><%= testName  %></p>
+            </div>
+            <div class="table-cell">
+                <p><%= testResult  %></p>
+            </div>
+            <!-- <div class="table-cell br-0">
+                <p>25.0 mg</p>
+            </div> -->
+        </div>
+    </div>
+</body>
+
+</html>

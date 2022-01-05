@@ -25,7 +25,7 @@ const test = new Schema({
     },
     testStatus:{
         type: String,
-        enum: ['sent', 'completed']
+        enum: ['labworkOrdered','labworkComplete','sampleSent', 'completed']
     },
     result:{
         type: String,

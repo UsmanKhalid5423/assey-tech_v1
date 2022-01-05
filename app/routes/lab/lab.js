@@ -22,6 +22,17 @@ const upload = require("../../middlewares/uploadImage");
 router.route('/signup').post(validator.add,lab.signUp);
 
 /**
+ * Controller: It is used to add doctor profile.
+ */
+ router.route('/verify/OTP').post(lab.verifyOTP);
+
+ /**
+ * Controller: It is used to add doctor profile.
+ */
+  router.route('/resend/OTP').post(lab.resendOTP);
+
+
+/**
  * Controller: It is used for lab login.
  */
 router.route('/login').post(validator.login, lab.login);

@@ -18,8 +18,8 @@ let schema;
 /*******************************************************/
 const add = (req, res, next) => {
   schema = joi.object().keys({
-    testStatus: joi.string().valid('sent', 'completed').required(),
-    result: joi.string().required(),
+    testStatus: joi.string().valid('labworkOrdered','labworkComplete','sampleSent', 'completed').required(),
+    //result: joi.string().optional(),
   })
 
   validatingSchema.joiValidator(req.body, schema, next)

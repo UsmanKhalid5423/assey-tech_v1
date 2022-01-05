@@ -4,6 +4,9 @@
 const database = require("../../utility/calls/databaseRequest");
 const response = require("../../utility/function/response");
 const models = require("../../../database/schema/instance");
+const code = require("../../utility/function/code");
+const nodeMailer = require("../../../utility/service/email");
+
 //const response = require("../../utility/functions/response");
 /*******************************************************/
 // Importing Npm Modules.
@@ -17,10 +20,66 @@ require("dotenv").config();
 //Main Controllers.
 /*******************************************************/
 
+
+
+/**
+ * Controller: It is used create patient.
+ */
+ const signUp = async (req , res ,next) =>{
+    try {
+
+        const {email} = req.body
+        const OTP = code.otpCode();
+        const isUnique = await isDataUnique(req);
+        if(!isUnique)
+        {
+            return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
+        }
+        req.body.OTP = OTP 
+        let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+        nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email );
+        let result = await manageLab(req,new models.lab())
+        delete result.OTP
+        delete result.isEmailVerified
+        delete result.password
+        return response.send(req, res, next, "info", 201, "VERIFY_EMAIL", result);
+
+        //return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
+
+// old
 /**
  * Controller: It is used create admin.
  */
-const signUp = async (req, res, next) => {
+ const signUp_old = async (req, res, next) => {
     try {
         const isUnique = await isDataUnique(req);
         if(!isUnique)
@@ -57,17 +116,16 @@ const signUp = async (req, res, next) => {
         }
     }
 };
+
+
 /**
  * Controller: It is used to login.
  */
-const login = async (req, res, next) => {
+ const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        //const user = await database.findBy(models.registrationSchemaForDr,{ 'email': email });
-        
         const user = await database.findBy(models.lab,{ 'email': email });
-        
-        if (user) {
+        if (user && user.isEmailVerified) {
             const comparingPasswords = await bcrypt.comparsion(password, user.password);
             if (comparingPasswords) {
 
@@ -114,6 +172,22 @@ const login = async (req, res, next) => {
                 });
             }
         }
+        else if(user && !user.isEmailVerified)
+        {
+            const OTP = code.otpCode();
+            let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+            nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email);
+            user.OTP = OTP;
+            await database.save(user)
+            delete user.OTP
+            delete user.isEmailVerified
+            delete user.password
+            return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", user);
+
+        }
         return next({
             code: 401,
             message: "AUTHORIZATION_FAILED",
@@ -127,6 +201,130 @@ const login = async (req, res, next) => {
         });
     }
 };
+
+
+const verifyOTP = async (req , res ,next) =>{
+    try {
+
+        const {email,OTP} = req.body
+
+        console.log('==== >>> email == >>> ',email)
+        
+        const user = await database.findBy(models.lab,{ 'email': email });
+        console.log('==== >>> user == >>> ',user)
+        if(user)
+        {
+            if(user.OTP==OTP)
+            {
+                user.isEmailVerified = true
+                await database.save(user)
+                console.log('==== >>> user == >>> ++++ ---- ',user)
+
+                delete user.OTP
+                delete user.isEmailVerified
+                delete user.password
+                return response.send(req, res, next, "info", 200, "SIGN_UP_COMPLETED", user);
+            }
+            else
+            {
+                return response.send(req, res, next, "info", 200, "INCORRECT_OTP", null);
+            }
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+
+        //return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
+
+
+const resendOTP = async (req , res ,next) =>{
+    try {
+
+        const {email} = req.body
+        console.log('=== >> email == >> ',email)
+        const user = await database.findBy(models.lab,{ 'email': email });
+        if(user)
+        {
+            const OTP = code.otpCode();
+            let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+            nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email);
+            user.OTP = OTP;
+            await database.save(user)
+            return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", user);
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
+
+
 
 /**
  * Controller: It is used by doctor to add/update profile.
@@ -304,7 +502,9 @@ module.exports = {
     profile,
     updateProfile,
     find,
-    logout
+    logout,
+    verifyOTP,
+    resendOTP
 };
 
 
