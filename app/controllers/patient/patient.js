@@ -198,7 +198,7 @@ const verifyOTP = async (req , res ,next) =>{
             }
             else
             {
-                return response.send(req, res, next, "info", 200, "INCORRECT_OTP", null);
+                return response.send(req, res, next, "info", 208, "INCORRECT_OTP", null);
             }
         }
         return response.send(
