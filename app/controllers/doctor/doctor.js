@@ -11,7 +11,6 @@ const moment = require("moment");
 const bcrypt = require("../../utility/function/bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-
 /*******************************************************/
 //Main Controllers.
 /*******************************************************/
@@ -128,10 +127,21 @@ const profile = async (req,res,next)=>{
             {
                 return response.send(req, res, next, "info", 200, "PROFILE_ALREADY_EXISTS", doctorProfiledetails);
             }
-            let  doctorProfile = new models.doctorProfile()
-            let result = await manageDoctorProfile(req,doctorProfile,doctorId)
+            
+            console.log('==== >>> BEFORE DOC UPDATE === >>',doctorDetails)
 
-            return response.send(req, res, next, "info", 201, "PROFILE_ADDED", result);
+
+            let doctor = await manageDoctor_v2(req,doctorDetails);
+
+            console.log('==== >>> AFTER DOC UPDATE === >>',doctor)
+
+            let  doctorProfile = new models.doctorProfile()
+            let profile = await manageDoctorProfile(req,doctorProfile,doctorId)
+            let data={
+                doctorDetails: doctor,
+                doctorProfileDetails: profile
+            }
+            return response.send(req, res, next, "info", 201, "PROFILE_ADDED", data);
         }
         return response.send(
             req,
@@ -170,6 +180,7 @@ const profile = async (req,res,next)=>{
         }
         if(doctorProfile)
         {
+            await manageDoctor_v2(req,doctorDetails);
             let  doctorProfileDetails = await manageDoctorProfile(req,doctorProfile,doctorId)
             return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", doctorProfileDetails);
         }
@@ -315,16 +326,30 @@ const manageDoctor = async (req, doctor) => {
     return await database.save(doctor);
 }
 
+
+const manageDoctor_v2 = async (req, doctor) => {
+    
+    const { fullName, email,age,phoneNumber } = req.body;
+    doctor.full_name = fullName
+    doctor.email = email
+    doctor.age = age
+    doctor.phone_number = phoneNumber
+    return await database.save(doctor);
+}
+
+
 /**
  * Controller: It is manage doctor profile/extra information.
  */
 const manageDoctorProfile = async (req, doctorProfile,doctorId) => {
     
-    const { gender, dateOfBirth,medicalSpecialty,address } = req.body;
+    const { gender, dateOfBirth,licenseExpiryDate,address,license } = req.body;
     doctorProfile._id = doctorId
     doctorProfile.gender = gender
     doctorProfile.dateOfBirth = dateOfBirth
-    doctorProfile.medicalSpecialty = medicalSpecialty
+    doctorProfile.licenseExpiryDate = licenseExpiryDate
+    doctorProfile.license = license
+
     doctorProfile.address = address
     doctorProfile.image = req.files.length>0 ? req.files[0].filename : doctorProfile.image
     return await database.save(doctorProfile);

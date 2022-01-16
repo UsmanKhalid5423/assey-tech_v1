@@ -15,17 +15,25 @@ const exrtaProfile = new Schema({
         type: String,
         required: true
     },
-    medicalSpecialty: {
-        type: String,
-        required: true
-    },
+    // medicalSpecialty: {
+    //     type: String,
+    //     required: true
+    // },
     address: {
         type: String,
         required: true
     },
     image: {
         type: String
-    }
+    },
+    licenseExpiryDate: {
+        type: Date,
+        required: false
+    },
+    license: {
+        type: String,
+        required: true
+    },
     //     get:(images)=>{ return `${appurl}/${images}`; }
 }
     // }

@@ -22,7 +22,7 @@ const add = (req, res, next) => {
     labId: joi.string().required(),
     testName: joi.string().required(),
     date: joi.date().required(),
-    testStatus: joi.string().valid('sent', 'completed').required(),
+    testStatus: joi.string().valid('labworkOrdered','labworkComplete','sampleSent', 'completed').required(),
 
   })
 

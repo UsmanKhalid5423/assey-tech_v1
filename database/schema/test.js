@@ -9,7 +9,7 @@ const test = new Schema({
     },
     doctorId:{
         type: String,
-        required:true
+        required:false
     },
     labId:{
         type: String,
