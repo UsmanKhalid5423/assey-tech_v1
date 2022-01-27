@@ -53,9 +53,20 @@ const login = (req, res, next) => {
 
   validatingSchema.joiValidator(req.body, schema, next)
 }
-  
+const createPatientOrderTestVS = (req,res,next)=> {
+  schema = joi.object().keys({
+    patient_name: joi.string().required(),
+    patient_phone: joi.string().required(),
+    patient_address: joi.string().required(),
+    test_name: joi.string().required(),
+    date: joi.string().required(),
+  })
+  validatingSchema.joiValidator(req.body, schema, next)
+}
+
 module.exports = {
   add,
   profile,
-  login
+  login,
+  createPatientOrderTestVS
 }

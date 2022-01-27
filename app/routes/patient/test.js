@@ -12,6 +12,7 @@ const authentication = (process.env.ENV === "testing") ? require("../../middlewa
 const test = require('../../controllers/patient/test');
 const validator = require("./../../validation/doctor/doctor")
 const commonValidator = require("./../../validation/validator")
+const patientValidator = require("../../validation/patient/patient")
 const upload = require("../../middlewares/uploadImage");
 /*******************************************************/
 // Defining Routes.
@@ -29,6 +30,7 @@ const upload = require("../../middlewares/uploadImage");
  */
   router.route('/view/test').get(authentication('patient'), test.fetch);
 
+  router.route('/add/test').post(authentication('patient'),patientValidator.createPatientOrderTestVS, test.add);
 
 /*******************************************************/
 // Exporting Routes.

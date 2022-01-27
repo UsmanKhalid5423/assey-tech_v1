@@ -141,11 +141,45 @@ require("dotenv").config();
     }
 }
 
-
+const add = async (req,res,next) => {
+    try{
+        const body = req.body
+        const result = await models.patientTest.create(body)
+        if (result) {
+            return response.send(
+                req,
+                res,
+                next,
+                "info",
+                200,
+                "CREATED",
+                result
+            );
+        }
+        else {
+            return response.send(
+                req,
+                res,
+                next,
+                "info",
+                202,
+                "DATA_NOT_AVAILABLE",
+                null
+            );
+        }
+    }catch(error){
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
 /*******************************************************/
 // Exporting Controllers.
 /*******************************************************/
 module.exports = {
+    add,
     find,
     fetch
 };

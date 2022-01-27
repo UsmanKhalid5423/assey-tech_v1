@@ -14,6 +14,7 @@ const database = {
 	patient: require("./userAccountSchema"),
 	patientProfile: require("./patientModels/patientExtraProfileSchema"),
 	test: require("./test"),
+	patientTest: require("./patientModels/patientTestOrderSchema"),
 
 }
 
