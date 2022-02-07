@@ -29,6 +29,16 @@ router.route('/login').post(doctor.login);
 /**
  * Controller: It is used to add doctor profile.
  */
+ router.route('/verify/OTP').post(doctor.verifyOTP);
+
+ /**
+ * Controller: It is used to add doctor profile.
+ */
+   router.route('/resend/OTP').post(doctor.resendOTP);
+
+   /**
+ * Controller: It is used to add doctor profile.
+ */
 router.route('/add/profile').post(upload.uploadimg.any(),authentication('doctor'), doctor.profile);
 
 /**
@@ -47,7 +57,6 @@ router.route('/update/profile').patch(upload.uploadimg.any(),authentication('doc
  * Controller: It is used to logout doctor.
  */
 router.route('/logout').post(authentication('doctor'), doctor.logout);
-
 
 /*******************************************************/
 // Exporting Routes.

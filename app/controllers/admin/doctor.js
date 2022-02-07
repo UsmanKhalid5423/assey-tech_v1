@@ -312,13 +312,13 @@ const manageDoctor_v2 = async (req, doctor) => {
  */
 const manageDoctorProfile = async (req, doctorProfile,doctorId) => {
     
-    const { gender, dateOfBirth,licenseExpiryDate,address,license } = req.body;
+    const { gender, dateOfBirth,licenseExpiryDate,address,license,medicalSpecialty } = req.body;
     doctorProfile._id = doctorId
     doctorProfile.gender = gender
     doctorProfile.dateOfBirth = dateOfBirth
     doctorProfile.licenseExpiryDate = licenseExpiryDate
     doctorProfile.license = license
-
+    doctorProfile.medicalSpecialty = medicalSpecialty
     doctorProfile.address = address
     doctorProfile.image = req.files.length>0 ? req.files[0].filename : doctorProfile.image
     return await database.save(doctorProfile);
