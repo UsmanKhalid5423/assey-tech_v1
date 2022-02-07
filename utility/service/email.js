@@ -80,6 +80,7 @@ const dispatchEmail_v3 = (subject,body,userEmail) => {
             console.log(info);
         } else {
             console.log("Email sent: " + info.response);
+            
         }
     });
 }

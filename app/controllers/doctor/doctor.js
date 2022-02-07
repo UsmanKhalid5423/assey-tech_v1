@@ -11,6 +11,8 @@ const moment = require("moment");
 const bcrypt = require("../../utility/function/bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const nodeMailer = require("../../../utility/service/email");
+const code = require("../../utility/function/code");
 /*******************************************************/
 //Main Controllers.
 /*******************************************************/
@@ -112,6 +114,122 @@ const login = async (req, res, next) => {
     }
 };
 
+const verifyOTP = async (req , res ,next) =>{
+    try {
+
+        const {email,OTP} = req.body
+
+        console.log('==== >>> email == >>> ',email)
+        
+        const user = await database.findBy(models.doctor,{ 'email': email });
+        console.log('==== >>> user == >>> ',user)
+        if(user)
+        {
+            if(user.OTP==OTP)
+            {
+                user.isEmailVerified = true
+                await database.save(user)
+                delete user.OTP
+                delete user.isEmailVerified
+                delete user.password
+                return response.send(req, res, next, "info", 200, "SIGN_UP_COMPLETED", user);
+            }
+            else
+            {
+                return response.send(req, res, next, "info", 208, "INCORRECT_OTP", null);
+            }
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+
+        //return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
+
+const resendOTP = async (req , res ,next) =>{
+    try {
+
+        const {email} = req.body
+        const user = await database.findBy(models.doctor,{ 'email': email });
+        if(user)
+        {
+            const OTP = code.otpCode();
+            let emailBody = `This is your one time OTP password. Use this password to complete signup process.<br>
+                        ${OTP}
+                        <br>Please don't share it with anyone.`
+
+            nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email);
+            user.OTP = OTP;
+            await database.save(user)
+            return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", user);
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    } catch (error) {
+        let errorMessge;
+        if (Number(error.code) === 11000) {
+            if (error.errmsg.includes("contact.email"))
+                errorMessge = "EMAIL_NOT_UNIQUE";
+            else
+                errorMessge = "MOBILE_NUMBER_NOT_UNIQUE";
+            response.send(
+                req,
+                res,
+                next,
+                "warn",
+                208,
+                errorMessge,
+                null
+            );
+        }
+        else {
+            return next({
+                code: 500,
+                message: "SERVER_ERROR",
+                data: error
+            });
+        }
+    }
+};
 /**
  * Controller: It is used by doctor to add/update profile.
  */
@@ -224,7 +342,7 @@ const profile = async (req,res,next)=>{
                 doctorDetails: doctorDetails,
                 doctorProfileDetails: doctorProfileDetails
             }
-            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", data);
+            return response.send(req, res, next, "info", 200, "PROFILE_DETAILS", data);
 
         }
         
@@ -302,7 +420,9 @@ module.exports = {
     profile,
     updateProfile,
     find,
-    logout
+    logout,
+    verifyOTP,
+    resendOTP
 };
 
 
@@ -343,13 +463,13 @@ const manageDoctor_v2 = async (req, doctor) => {
  */
 const manageDoctorProfile = async (req, doctorProfile,doctorId) => {
     
-    const { gender, dateOfBirth,licenseExpiryDate,address,license } = req.body;
+    const { gender, dateOfBirth,licenseExpiryDate,address,license,medicalSpecialty } = req.body;
     doctorProfile._id = doctorId
     doctorProfile.gender = gender
     doctorProfile.dateOfBirth = dateOfBirth
     doctorProfile.licenseExpiryDate = licenseExpiryDate
     doctorProfile.license = license
-
+    doctorProfile.medicalSpecialty = medicalSpecialty
     doctorProfile.address = address
     doctorProfile.image = req.files.length>0 ? req.files[0].filename : doctorProfile.image
     return await database.save(doctorProfile);

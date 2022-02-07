@@ -15,10 +15,10 @@ const exrtaProfile = new Schema({
         type: String,
         required: true
     },
-    // medicalSpecialty: {
-    //     type: String,
-    //     required: true
-    // },
+    medicalSpecialty: {
+        type: String,
+        required: true
+    },
     address: {
         type: String,
         required: true

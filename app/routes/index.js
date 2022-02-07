@@ -12,6 +12,7 @@ module.exports = function (app) {
     app.use('/api/v1/assay/patient', require('./patient/patient'));
     app.use('/api/v1/assay/patient', require('./patient/test'));
     app.use('/api/v1/assay/dashboard', require('./dashboard'));
+    app.use('/api/v1/assay/general', require('./general'));
 }
 
 
