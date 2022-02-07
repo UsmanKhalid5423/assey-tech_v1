@@ -45,7 +45,10 @@ module.exports = function (type) {
                     case "patient":
                     
                         data = await database.findBy(models.tokenSchema, { 'token': token } );
-                        result = await database.findBy(models.patient,{'email' : data.email})
+                        if(data)
+                        {
+                            result = await database.findBy(models.patient,{'email' : data.email})
+                        }
                         if(!result)
                         {
                             return next({
@@ -58,7 +61,26 @@ module.exports = function (type) {
                     case "lab":
                     
                         data = await database.findBy(models.tokenSchema, { 'token': token } );
-                        result = await database.findBy(models.lab,{'email' : data.email})
+                        if(data)
+                        {
+                            result = await database.findBy(models.lab,{'email' : data.email})
+                        }
+                        if(!result)
+                        {
+                            return next({
+                                code: 403,
+                                message: "UN_AUTHORIZED_USER",
+                                data: null
+                            })
+                        }
+                        break;
+                    case "admin":
+                
+                        data = await database.findBy(models.tokenSchema, { 'token': token } );
+                        if(data)
+                        {
+                            result = await database.findBy(models.admin,{'email' : data.email})
+                        }
                         if(!result)
                         {
                             return next({

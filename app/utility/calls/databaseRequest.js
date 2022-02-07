@@ -77,6 +77,14 @@
       return await model.updateOne(filter, query);
   
   }
+
+
+  const remove = async (model, where) => {
+    return await model.findOneAndDelete(where);
+  };
+
+
+
   /*******************************************************/
   // Exporting Controllers.
   /*******************************************************/
@@ -87,6 +95,7 @@
     findById_v2,
     findBy,
     count,
-    update
+    update,
+    remove
   };
   

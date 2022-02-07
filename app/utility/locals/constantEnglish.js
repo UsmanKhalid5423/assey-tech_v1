@@ -18,7 +18,8 @@ const constants = {
     TEST_ADDED: "Test added successfully",
     RESULT_ADDED: "Result added successfully",
     VERIFY_EMAIL: "An OTP is sent to your email. Kindly verify your email.",
-    INCORRECT_OTP: "You enter an incorrect OTP password. Please try again."
+    INCORRECT_OTP: "You enter an incorrect OTP password. Please try again.",
+    REMOVED_SUCCESSFULLY: "Record removed successfully"
 
   };
   module.exports = function (key) {

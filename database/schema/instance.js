@@ -15,7 +15,7 @@ const database = {
 	patientProfile: require("./patientModels/patientExtraProfileSchema"),
 	test: require("./test"),
 	patientTest: require("./patientModels/patientTestOrderSchema"),
-
+	admin: require("./admin"),
 }
 
 module.exports = database;
