@@ -13,9 +13,11 @@ module.exports = function (app) {
     app.use('/api/v1/assay/patient', require('./patient/test'));
     app.use('/api/v1/assay/dashboard', require('./dashboard'));
 
+    // for admin
     app.use('/api/v1/assay/admin', require('./admin/admin'));
-
     app.use('/api/v1/assay/admin', require('./admin/doctor'));
+    app.use('/api/v1/assay/admin', require('./admin/lab'));
+
 
 
 }

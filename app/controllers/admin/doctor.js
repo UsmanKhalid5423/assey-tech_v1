@@ -172,7 +172,7 @@ const profile = async (req,res,next)=>{
                 doctorDetails: doctorDetails,
                 doctorProfileDetails: doctorProfileDetails
             }
-            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", data);
+            return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", data);
 
         }
         
@@ -211,7 +211,7 @@ const profile = async (req,res,next)=>{
             query = {};
        
         let data = await database.fetch(models.doctor,query)
-        return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", data);
+        return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", data);
 
     }
     catch (error) {
@@ -252,17 +252,6 @@ const profile = async (req,res,next)=>{
             "DATA_NOT_AVAILABLE",
             null
         );
-        
-        return response.send(
-            req,
-            res,
-            next,
-            "info",
-            202,
-            "DATA_NOT_AVAILABLE",
-            null
-        );
-        
     }
     catch (error) {
         return next({

@@ -203,8 +203,8 @@ const resendOTP = async (req , res ,next) =>{
  */
 const profile = async (req,res,next)=>{
     try {
-        const email = req.userEmail
-        const labUserDetails = await database.findBy(models.lab,{ 'email': email });
+        const id = req.params.id
+        const labUserDetails = await database.findBy(models.lab,{ '_id': id });
         if(labUserDetails)
         {
             const labUserId = labUserDetails._id;
@@ -244,10 +244,10 @@ const profile = async (req,res,next)=>{
  const updateProfile = async (req,res,next)=>{
 
     try {
-        const email = req.userEmail
+        const id = req.params.id
         let labProfile;
         let labId;
-        const labDetails = await database.findBy(models.lab,{ 'email': email });
+        const labDetails = await database.findBy(models.lab,{ '_id': id });
         if(labDetails)
         {
             labId = labDetails._id;
@@ -286,10 +286,10 @@ const profile = async (req,res,next)=>{
  const find = async (req,res,next)=>{
 
     try {
-        const email = req.userEmail
+        const id = req.params.id
         let labId;
         let labProfileDetails;
-        const labDetails = await database.findBy(models.lab,{ 'email': email });
+        const labDetails = await database.findBy(models.lab,{ '_id': id });
         if(labDetails)
         {
             labId = labDetails._id;
@@ -324,6 +324,71 @@ const profile = async (req,res,next)=>{
 
 
 
+/**
+ * Controller: It is used by doctor to add/update profile.
+ */
+ const fetch = async (req,res,next)=>{
+
+    try {
+        const { search } = req.query;
+
+        if (search)
+            query = { $or: [{ 'lab_name': { $regex: search, $options: "i" } }] };
+        else
+            query = {};
+       
+        let data = await database.fetch(models.lab,query)
+        return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", data);
+
+    }
+    catch (error) {
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
+
+
+
+/**
+ * Controller: It is used by doctor to add/update profile.
+ */
+ const remove = async (req,res,next)=>{
+
+    try {
+        const id = req.params.id
+        let labId;
+        const labDetails = await database.findBy(models.lab,{ '_id': id });
+        if(labDetails)
+        {
+            labId = labDetails._id;
+            await database.remove(models.labProfile,{ '_id': labId });
+            await database.remove(models.lab,{ '_id': labId });
+            return response.send(req, res, next, "info", 200, "REMOVED_SUCCESSFULLY", null);
+        }
+        return response.send(
+            req,
+            res,
+            next,
+            "info",
+            202,
+            "DATA_NOT_AVAILABLE",
+            null
+        );
+        
+    }
+    catch (error) {
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
+
+
 
 
 
@@ -332,13 +397,13 @@ const profile = async (req,res,next)=>{
 /*******************************************************/
 module.exports = {
     signUp,
-    login,
     profile,
     updateProfile,
     find,
-    logout,
     verifyOTP,
-    resendOTP
+    resendOTP,
+    fetch,
+    remove
 };
 
 
