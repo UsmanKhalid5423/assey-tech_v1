@@ -204,6 +204,7 @@ const resendOTP = async (req , res ,next) =>{
 const profile = async (req,res,next)=>{
     try {
         const id = req.params.id
+        let data={};
         const labUserDetails = await database.findBy(models.lab,{ '_id': id });
         if(labUserDetails)
         {
@@ -211,12 +212,19 @@ const profile = async (req,res,next)=>{
             const labProfiledetails = await database.findBy(models.labProfile,{ '_id': labUserId });
             if(labProfiledetails)
             {
-                return response.send(req, res, next, "info", 200, "LAB_ALREADY_EXISTS", labProfiledetails);
+                data = {
+                    labDetails: labUserDetails,
+                    labProfileDetails: labProfiledetails   
+                }
+                return response.send(req, res, next, "info", 200, "LAB_ALREADY_EXISTS", data);
             }
             let  labProfile = new models.labProfile()
             let result = await manageLabProfile(req,labProfile,labUserId)
-
-            return response.send(req, res, next, "info", 201, "LAB_ADDED", result);
+            data = {
+                labDetails: labUserDetails,
+                labProfileDetails: result   
+            }
+            return response.send(req, res, next, "info", 201, "LAB_ADDED", data);
         }
         return response.send(
             req,
@@ -247,6 +255,7 @@ const profile = async (req,res,next)=>{
         const id = req.params.id
         let labProfile;
         let labId;
+        let data = {}
         const labDetails = await database.findBy(models.lab,{ '_id': id });
         if(labDetails)
         {
@@ -255,8 +264,12 @@ const profile = async (req,res,next)=>{
         }
         if(labProfile)
         {
-            let  labProfileDetails = await manageLabProfile(req,labProfile,labId)
-            return response.send(req, res, next, "info", 201, "LAB_UPDATED", labProfileDetails);
+            let labProfileDetails = await manageLabProfile(req,labProfile,labId)
+            data = {
+                labDetails: labDetails,
+                labProfileDetails: labProfileDetails   
+            }
+            return response.send(req, res, next, "info", 200, "LAB_UPDATED", data);
         }
         return response.send(
             req,
