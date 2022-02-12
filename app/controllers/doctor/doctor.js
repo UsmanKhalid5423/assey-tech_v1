@@ -128,6 +128,7 @@ const verifyOTP = async (req , res ,next) =>{
             if(user.OTP==OTP)
             {
                 user.isEmailVerified = true
+                user.joiningDate = moment().format('YYYY-MM-DD')
                 await database.save(user)
                 delete user.OTP
                 delete user.isEmailVerified
@@ -236,6 +237,15 @@ const resendOTP = async (req , res ,next) =>{
 const profile = async (req,res,next)=>{
     try {
         const email = req.userEmail
+        const reqEmail = req.body.email
+        if(email!=reqEmail)
+        {
+            const isUnique = await isDataUnique(req);
+            if(!isUnique)
+            {
+                return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
+            }
+        }
         const doctorDetails = await database.findBy(models.doctor,{ 'email': email });
         if(doctorDetails)
         {
@@ -243,18 +253,17 @@ const profile = async (req,res,next)=>{
             const doctorProfiledetails = await database.findBy(models.doctorProfile,{ '_id': doctorId });
             if(doctorProfiledetails)
             {
-                return response.send(req, res, next, "info", 200, "PROFILE_ALREADY_EXISTS", doctorProfiledetails);
+                return response.send(req, res, next, "info", 208, "PROFILE_ALREADY_EXISTS", doctorProfiledetails);
             }
-            
-            console.log('==== >>> BEFORE DOC UPDATE === >>',doctorDetails)
-
-
-            let doctor = await manageDoctor_v2(req,doctorDetails);
-
-            console.log('==== >>> AFTER DOC UPDATE === >>',doctor)
-
+            let doctor = await manageDoctor(req,doctorDetails);
             let  doctorProfile = new models.doctorProfile()
             let profile = await manageDoctorProfile(req,doctorProfile,doctorId)
+
+            let token = req.headers.authorization; 
+            let tokenUser = await database.findBy(models.tokenSchema, { 'token': token } );
+            tokenUser.email = doctor.email
+            await database.save(tokenUser)
+
             let data={
                 doctorDetails: doctor,
                 doctorProfileDetails: profile
@@ -288,6 +297,15 @@ const profile = async (req,res,next)=>{
 
     try {
         const email = req.userEmail
+        const reqEmail = req.body.email
+        if(email!=reqEmail)
+        {
+            const isUnique = await isDataUnique(req);
+            if(!isUnique)
+            {
+                return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
+            }
+        }
         let doctorProfile;
         let doctorId;
         const doctorDetails = await database.findBy(models.doctor,{ 'email': email });
@@ -298,9 +316,19 @@ const profile = async (req,res,next)=>{
         }
         if(doctorProfile)
         {
-            await manageDoctor_v2(req,doctorDetails);
-            let  doctorProfileDetails = await manageDoctorProfile(req,doctorProfile,doctorId)
-            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", doctorProfileDetails);
+           await manageDoctor(req,doctorDetails);
+           let  doctorProfileDetails = await manageDoctorProfile(req,doctorProfile,doctorId)
+        
+           let token = req.headers.authorization; 
+           let tokenUser = await database.findBy(models.tokenSchema, { 'token': token } );
+           tokenUser.email = doctorDetails.email
+           await database.save(tokenUser)
+            
+           let data = {
+            doctorDetails: doctorProfile,
+            doctorProfileDetails: doctorProfileDetails   
+        }
+            return response.send(req, res, next, "info", 200, "PROFILE_UPDATED", data);
         }
         return response.send(
             req,
@@ -434,7 +462,7 @@ const manageDoctor = async (req, doctor) => {
     
     const { fullName, email,age,phoneNumber, password } = req.body;
     const encryptedPassword =  await bcrypt.encryption(password);
-
+    doctor.passwordText = password
     doctor.full_name = fullName
     doctor.email = email
     doctor.age = age

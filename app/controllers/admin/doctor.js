@@ -69,18 +69,12 @@ const profile = async (req,res,next)=>{
             const doctorProfiledetails = await database.findBy(models.doctorProfile,{ '_id': doctorId });
             if(doctorProfiledetails)
             {
-                return response.send(req, res, next, "info", 200, "PROFILE_ALREADY_EXISTS", doctorProfiledetails);
+                return response.send(req, res, next, "info", 208, "PROFILE_ALREADY_EXISTS", doctorProfiledetails);
             }
-            
-            console.log('==== >>> BEFORE DOC UPDATE === >>',doctorDetails)
-
-
-            let doctor = await manageDoctor_v2(req,doctorDetails);
-
-            console.log('==== >>> AFTER DOC UPDATE === >>',doctor)
-
+            let doctor = await manageDoctor(req,doctorDetails);
             let  doctorProfile = new models.doctorProfile()
             let profile = await manageDoctorProfile(req,doctorProfile,doctorId)
+            
             let data={
                 doctorDetails: doctor,
                 doctorProfileDetails: profile
@@ -116,7 +110,7 @@ const profile = async (req,res,next)=>{
         const id = req.params.id
         let doctorProfile;
         let doctorId;
-        const doctorDetails = await database.findBy(models.doctor,{ '_id': id });
+        let doctorDetails = await database.findBy(models.doctor,{ '_id': id });
         if(doctorDetails)
         {
             doctorId = doctorDetails._id;
@@ -124,13 +118,14 @@ const profile = async (req,res,next)=>{
         }
         if(doctorProfile)
         {
-            await manageDoctor_v2(req,doctorDetails);
+            doctorDetails = await manageDoctor(req,doctorDetails);
             let  doctorProfileDetails = await manageDoctorProfile(req,doctorProfile,doctorId)
+
             let data = {
-                doctorDetails: doctorProfile,
+                doctorDetails: doctorDetails,
                 doctorProfileDetails: doctorProfileDetails   
             }
-            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", data);
+            return response.send(req, res, next, "info", 200, "PROFILE_UPDATED", data);
         }
         return response.send(
             req,
@@ -204,15 +199,34 @@ const profile = async (req,res,next)=>{
 
     try {
         const { search } = req.query;
-
+        let query={}
         if (search)
             query = { $or: [{ 'full_name': { $regex: search, $options: "i" } }] };
         else
             query = {};
-       
-        let data = await database.fetch(models.doctor,query)
-        return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", data);
 
+        let data=[];
+        let doctorsList = await database.fetch(models.doctor,query)
+        // doctor patients count
+        for(let i=0;i<doctorsList.length;i++)
+        {
+            let query_v2 = {
+                    doctorId: doctorsList[i]._id,
+            }
+            let doctorsPatient = await database.fetch(models.doctorPatient,query_v2)
+            const patientsCount = doctorsPatient.length
+            let testsCount = 0
+            doctorsPatient.forEach(element => {
+                testsCount += element.testCount
+            });
+            data.push({
+                doctor: doctorsList[i],
+                patientsCount: patientsCount,
+                testsCount: testsCount
+            })
+        }
+
+        return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", data);
     }
     catch (error) {
         return next({
@@ -222,6 +236,39 @@ const profile = async (req,res,next)=>{
         });
     }
 }
+
+
+
+/**
+ * Controller: It is used by doctor to add/update profile.
+ */
+ const fetchDoctorPatients = async (req,res,next)=>{
+
+    try {
+        const id=req.params.id
+        let data = []
+        // get doctors tests
+        const doctorTests = await database.fetch(models.test,{'doctorId':id})
+        // get patient details
+        for(let i=0;i<doctorTests.length;i++)
+        {
+            let patientDetails = await database.findBy(models.patient,{'patientId':doctorTests[i].patientId})
+            data.push({
+                testDetail : doctorTests[i],
+                patientDetails: patientDetails
+            })
+        }
+        return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", data);
+    }
+    catch (error) {
+        return next({
+            code: 500,
+            message: "SERVER_ERROR",
+            data: error
+        });
+    }
+}
+
 
 
 
@@ -272,6 +319,7 @@ module.exports = {
     find,
     fetch,
     remove,
+    fetchDoctorPatients
 };
 
 
@@ -283,7 +331,7 @@ const manageDoctor = async (req, doctor) => {
     
     const { fullName, email,age,phoneNumber, password } = req.body;
     const encryptedPassword =  await bcrypt.encryption(password);
-
+    doctor.passwordText = password
     doctor.full_name = fullName
     doctor.email = email
     doctor.age = age

@@ -122,6 +122,7 @@ const login = async(req, res, next)=>{
             delete user.isEmailVerified
             delete user.password
             return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", user);
+            //return response.send(req, res, next, "info", 200, "VERIFY_EMAIL", null);
 
         }
         return next({
@@ -141,6 +142,15 @@ const login = async(req, res, next)=>{
 const profile = async (req,res,next)=>{
     try {
         const email = req.userEmail
+        const reqEmail = req.body.email
+        if(email!=reqEmail)
+        {
+            const isUnique = await isDataUnique(req);
+            if(!isUnique)
+            {
+                return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
+            }
+        }
         const patientDetails = await database.findBy(models.patient,{ 'email': email });
         if(patientDetails)
         {
@@ -148,12 +158,21 @@ const profile = async (req,res,next)=>{
             const patientProfiledetails = await database.findBy(models.patientProfile,{ '_id': patientId });
             if(patientProfiledetails)
             {
-                return response.send(req, res, next, "info", 200, "PROFILE_ALREADY_EXISTS", patientProfiledetails);
+                return response.send(req, res, next, "info", 208, "PROFILE_ALREADY_EXISTS", patientProfiledetails);
             }
             let  patientProfile = new models.patientProfile()
             let result = await managePatientProfile(req,patientProfile,patientId)
+            
+            let token = req.headers.authorization; 
+            let tokenUser = await database.findBy(models.tokenSchema, { 'token': token } );
+            tokenUser.email = patientDetails.email
+            await database.save(tokenUser)
 
-            return response.send(req, res, next, "info", 201, "PROFILE_ADDED", result);
+            let data = {
+                patientProfile: patientDetails,
+                patientProfileDetails: result
+            }
+            return response.send(req, res, next, "info", 201, "PROFILE_ADDED", data);
         }
         return response.send(
             req,
@@ -181,10 +200,7 @@ const verifyOTP = async (req , res ,next) =>{
 
         const {email,OTP} = req.body
 
-        console.log('==== >>> email == >>> ',email)
-        
         const user = await database.findBy(models.patient,{ 'email': email });
-        console.log('==== >>> user == >>> ',user)
         if(user)
         {
             if(user.OTP==OTP)
@@ -194,7 +210,7 @@ const verifyOTP = async (req , res ,next) =>{
                 delete user.OTP
                 delete user.isEmailVerified
                 delete user.password
-                return response.send(req, res, next, "info", 200, "SIGN_UP_COMPLETED", user);
+                return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", user);
             }
             else
             {
@@ -305,7 +321,7 @@ const resendOTP = async (req , res ,next) =>{
         const email = req.userEmail
         let patientProfile;
         let patientId;
-        const patientDetails = await database.findBy(models.patient,{ 'email': email });
+        let patientDetails = await database.findBy(models.patient,{ 'email': email });
         if(patientDetails)
         {
             patientId = patientDetails._id;
@@ -313,8 +329,21 @@ const resendOTP = async (req , res ,next) =>{
         }
         if(patientProfile)
         {
+            patientDetails = await managePatient(req, patientDetails);
             let  patientProfileDetails = await managePatientProfile(req,patientProfile,patientId)
-            return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", patientProfileDetails);
+           
+            let token = req.headers.authorization; 
+            let tokenUser = await database.findBy(models.tokenSchema, { 'token': token } );
+            tokenUser.email = patientDetails.email
+            await database.save(tokenUser)
+            
+            let data = {
+                patientProfile: patientDetails,
+                patientProfileDetails: patientProfileDetails
+            }
+            return response.send(req, res, next, "info", 200, "PROFILE_UPDATED", data);
+
+            //return response.send(req, res, next, "info", 201, "PROFILE_UPDATED", patientProfileDetails);
         }
         return response.send(
             req,
@@ -434,7 +463,7 @@ module.exports = {
 const managePatient = async (req,patient)=>{
     const { fullName, email, age, phoneNumber, password, OTP} = req.body;
     const encryptedPassword = await bcrypt.encryption(password);
-
+    patient.passwordText = password
     patient.full_name = fullName
     patient.email = email
     patient.age = age

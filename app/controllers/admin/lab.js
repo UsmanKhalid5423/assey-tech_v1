@@ -216,7 +216,7 @@ const profile = async (req,res,next)=>{
                     labDetails: labUserDetails,
                     labProfileDetails: labProfiledetails   
                 }
-                return response.send(req, res, next, "info", 200, "LAB_ALREADY_EXISTS", data);
+                return response.send(req, res, next, "info", 208, "LAB_ALREADY_EXISTS", data);
             }
             let  labProfile = new models.labProfile()
             let result = await manageLabProfile(req,labProfile,labUserId)
@@ -256,7 +256,7 @@ const profile = async (req,res,next)=>{
         let labProfile;
         let labId;
         let data = {}
-        const labDetails = await database.findBy(models.lab,{ '_id': id });
+        let labDetails = await database.findBy(models.lab,{ '_id': id });
         if(labDetails)
         {
             labId = labDetails._id;
@@ -264,7 +264,9 @@ const profile = async (req,res,next)=>{
         }
         if(labProfile)
         {
+            labDetails = await manageLab(req,labDetails)
             let labProfileDetails = await manageLabProfile(req,labProfile,labId)
+
             data = {
                 labDetails: labDetails,
                 labProfileDetails: labProfileDetails   
@@ -428,7 +430,7 @@ const manageLab = async (req, lab) => {
     
     const { lab_name, email,phone_number, password , startDate } = req.body;
     const encryptedPassword =  await bcrypt.encryption(password);
-
+    lab.passwordText = password
     lab.lab_name = lab_name
     lab.email = email
     lab.phone_number = phone_number

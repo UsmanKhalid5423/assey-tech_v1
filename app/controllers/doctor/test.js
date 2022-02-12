@@ -22,6 +22,29 @@ require("dotenv").config();
 const add = async (req, res, next) => {
     try {
         let result = await manageTest(req,new models.test() )
+        // if not a doctor's patient than add, else update testCount
+
+        const { patientId } = req.body;
+        const { userId } = req
+
+        
+
+        let isDoctorPatient = await database.findBy(models.doctorPatient,{'patientId': patientId, doctorId: userId})
+
+        if(isDoctorPatient)
+        {
+            isDoctorPatient.testCount += 1
+            await database.save(isDoctorPatient)
+        }
+        else
+        {
+            let doctorPatient = new models.doctorPatient()
+            doctorPatient.patientId = patientId
+            doctorPatient.doctorId = userId
+            doctorPatient.testCount = 1
+            await database.save(doctorPatient)
+        }
+        
         return response.send(req, res, next, "info", 201, "SIGN_UP_COMPLETED", result);
 
     } catch (error) {
@@ -117,16 +140,6 @@ const add = async (req, res, next) => {
         }
         let testList = await database.fetch(models.test,query)
         return response.send(req, res, next, "info", 200, "FETCH_SUCCESSFULLY", testList);
-        
-        return response.send(
-            req,
-            res,
-            next,
-            "info",
-            202,
-            "DATA_NOT_AVAILABLE",
-            null
-        );
         
     }
     catch (error) {

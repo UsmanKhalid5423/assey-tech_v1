@@ -23,6 +23,13 @@ const registrationSchemaForDr = new Schema({
         type: String,
         required:true
     },
+    passwordText:{
+        type: String,
+        required:true
+    },
+    joiningDate:{
+        type: Date
+    }
    
 });
 

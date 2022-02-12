@@ -23,6 +23,10 @@ const registrationSchema = new Schema({
         type: String,
         required:true
     },
+    passwordText:{
+        type: String,
+        required:true
+    },
     // change by usman khalid
     isEmailVerified:{
         type: Boolean,
@@ -33,7 +37,6 @@ const registrationSchema = new Schema({
         type: String,
         required:false
     },
-   
 });
 
 module.exports = mongoodb.model("account",registrationSchema);

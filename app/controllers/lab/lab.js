@@ -42,7 +42,7 @@ require("dotenv").config();
 
         nodeMailer.dispatchEmail_v3("OTP Password", emailBody,email );
         let result = await manageLab(req,new models.lab())
-        delete result.OTP
+        //delete result.OTP
         delete result.isEmailVerified
         delete result.password
         return response.send(req, res, next, "info", 201, "VERIFY_EMAIL", result);
@@ -220,6 +220,8 @@ const verifyOTP = async (req , res ,next) =>{
             if(user.OTP==OTP)
             {
                 user.isEmailVerified = true
+                user.joiningDate = moment().format('YYYY-MM-DD')
+
                 await database.save(user)
                 console.log('==== >>> user == >>> ++++ ---- ',user)
 
@@ -335,19 +337,38 @@ const resendOTP = async (req , res ,next) =>{
 const profile = async (req,res,next)=>{
     try {
         const email = req.userEmail
-        const labUserDetails = await database.findBy(models.lab,{ 'email': email });
+        const reqEmail = req.body.email
+        if(email!=reqEmail)
+        {
+            const isUnique = await isDataUnique(req);
+            if(!isUnique)
+            {
+                return response.send(req, res, next, "info", 208, "ALREADY_EXISTS", null);
+            }
+        }
+        let labUserDetails = await database.findBy(models.lab,{ 'email': email });
         if(labUserDetails)
         {
             const labUserId = labUserDetails._id;
             const labProfiledetails = await database.findBy(models.labProfile,{ '_id': labUserId });
             if(labProfiledetails)
             {
-                return response.send(req, res, next, "info", 200, "LAB_ALREADY_EXISTS", labProfiledetails);
+                return response.send(req, res, next, "info", 208, "LAB_ALREADY_EXISTS", labProfiledetails);
             }
+            labUserDetails = await manageLab(req,labUserDetails)
+            
+            let token = req.headers.authorization; 
+            let tokenUser = await database.findBy(models.tokenSchema, { 'token': token } );
+            tokenUser.email = labUserDetails.email
+            await database.save(tokenUser)
+
             let  labProfile = new models.labProfile()
             let result = await manageLabProfile(req,labProfile,labUserId)
-
-            return response.send(req, res, next, "info", 201, "LAB_ADDED", result);
+            data = {
+                labDetails: labUserDetails,
+                labProfileDetails: result   
+            }
+            return response.send(req, res, next, "info", 201, "LAB_ADDED", data);
         }
         return response.send(
             req,
@@ -378,7 +399,7 @@ const profile = async (req,res,next)=>{
         const email = req.userEmail
         let labProfile;
         let labId;
-        const labDetails = await database.findBy(models.lab,{ 'email': email });
+        let labDetails = await database.findBy(models.lab,{ 'email': email });
         if(labDetails)
         {
             labId = labDetails._id;
@@ -386,8 +407,19 @@ const profile = async (req,res,next)=>{
         }
         if(labProfile)
         {
+            labDetails = await manageLab(req,labDetails)
             let  labProfileDetails = await manageLabProfile(req,labProfile,labId)
-            return response.send(req, res, next, "info", 201, "LAB_UPDATED", labProfileDetails);
+           
+            let token = req.headers.authorization; 
+            let tokenUser = await database.findBy(models.tokenSchema, { 'token': token } );
+            tokenUser.email = labDetails.email
+            await database.save(tokenUser)
+            
+            let data = {
+                labProfile: labDetails,
+                labProfileDetails: labProfileDetails
+            }
+            return response.send(req, res, next, "info", 200, "LAB_UPDATED", data);
         }
         return response.send(
             req,
@@ -519,7 +551,7 @@ const manageLab = async (req, lab) => {
     
     const { lab_name, email,phone_number, password , startDate } = req.body;
     const encryptedPassword =  await bcrypt.encryption(password);
-
+    lab.passwordText = password
     lab.lab_name = lab_name
     lab.email = email
     lab.phone_number = phone_number

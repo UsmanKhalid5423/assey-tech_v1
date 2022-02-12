@@ -22,6 +22,9 @@ module.exports = function (app) {
     app.use('/api/v1/assay/admin', require('./admin/admin'));
     app.use('/api/v1/assay/admin', require('./admin/doctor'));
     app.use('/api/v1/assay/admin', require('./admin/lab'));
+    app.use('/api/v1/assay/admin', require('./admin/patient'));
+    app.use('/api/v1/assay/admin', require('./admin/test'));
+    app.use('/api/v1/assay/admin', require('./admin/dashboard'));
     //<!-------------------------- for admin by usman --------------------------!>
 
     // ahmad iqbal routes
